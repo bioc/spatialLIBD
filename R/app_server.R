@@ -548,7 +548,14 @@ app_server <- function(input, output, session) {
     )
 
     output$gene_warnings <- renderText({
-        these_warnings = static_gene()[['gene_warnings']]
+        #   Since 'static_gene()' is invoked twice (once also in the assignment
+        #   of 'output$gene'), we silence any errors that occur in this second
+        #   invocation to not duplicate error messages
+        these_warnings = NULL
+        temp = try(
+            { these_warnings = static_gene()[['gene_warnings']] }, silent = TRUE
+        )
+
         if (!is.null(these_warnings)) {
             paste("Warnings:", paste(these_warnings, collapse = "; "))
         } else {
