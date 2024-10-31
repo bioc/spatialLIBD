@@ -14,11 +14,11 @@
 #' @family functions for summarizing expression of multiple continuous variables simultaneously
 #' @keywords internal
 multi_gene_z_score <- function(cont_mat) {
-    #   Z-score calculation requires at least 2 features with nonzero variance.
+    #   Z-score calculation requires at least 1 feature with nonzero variance.
     #   Verify this and drop any zero-variance features
     good_indices <- which(colSds(cont_mat, na.rm = TRUE) != 0)
-    if (length(good_indices) < 2) {
-        stop("After dropping features with no expression variation, less than 2 features were left. This error can occur when using data from only 1 spot.", call. = FALSE)
+    if (length(good_indices) < 1) {
+        stop("After dropping features with no expression variation, no features were left. This error can occur when using data from only 1 spot.", call. = FALSE)
     }
     if (ncol(cont_mat) - length(good_indices) > 0) {
         warning(
