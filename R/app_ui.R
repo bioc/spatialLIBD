@@ -423,6 +423,7 @@ app_ui <- function() {
                                 actionButton("gene_grid_update", label = "Update grid plot"),
                                 downloadButton("downloadPlotGeneGrid", "Download PDF"),
                                 uiOutput("gene_grid_static"),
+                                textOutput("gene_grid_warnings"),
                                 helpText("Click the 'upgrade grid plot' button above to re-make this plot."),
                                 tags$br(),
                                 tags$br(),

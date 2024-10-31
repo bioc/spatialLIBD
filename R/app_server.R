@@ -267,28 +267,37 @@ app_server <- function(input, output, session) {
     static_gene_grid <- reactive({
         input$gene_grid_update
 
-        plots <-
-            vis_grid_gene(
-                spe,
-                geneid = isolate(input$geneid),
-                multi_gene_method = input$multi_gene_method,
-                assayname = isolate(input$assayname),
-                minCount = isolate(input$minCount),
-                return_plots = TRUE,
-                spatial = isolate(input$grid_spatial_gene),
-                cont_colors = isolate(cont_colors()),
-                image_id = isolate(input$imageid),
-                alpha = isolate(input$alphalevel),
-                point_size = isolate(input$pointsize),
-                sample_order = isolate(input$gene_grid_samples),
-                auto_crop = isolate(input$auto_crop),
-                is_stitched = is_stitched
-            )
-        cowplot::plot_grid(
+        gene_grid_warnings = NULL
+        withCallingHandlers({
+            plots <-
+                vis_grid_gene(
+                    spe,
+                    geneid = isolate(input$geneid),
+                    multi_gene_method = input$multi_gene_method,
+                    assayname = isolate(input$assayname),
+                    minCount = isolate(input$minCount),
+                    return_plots = TRUE,
+                    spatial = isolate(input$grid_spatial_gene),
+                    cont_colors = isolate(cont_colors()),
+                    image_id = isolate(input$imageid),
+                    alpha = isolate(input$alphalevel),
+                    point_size = isolate(input$pointsize),
+                    sample_order = isolate(input$gene_grid_samples),
+                    auto_crop = isolate(input$auto_crop),
+                    is_stitched = is_stitched
+                )
+        }, warning = function(w) {
+            gene_grid_warnings <<- c(gene_grid_warnings, conditionMessage(w))
+            invokeRestart("muffleWarning")
+        })
+
+        p_result = cowplot::plot_grid(
             plotlist = plots,
             nrow = isolate(input$gene_grid_nrow),
             ncol = isolate(input$gene_grid_ncol)
         )
+
+        return(list(p = p_result, gene_grid_warnings = gene_grid_warnings))
     })
 
     editImg_manipulations <- reactive({
@@ -474,7 +483,7 @@ app_server <- function(input, output, session) {
                 height = 8 * isolate(input$gene_grid_nrow),
                 width = 8 * isolate(input$gene_grid_ncol)
             )
-            print(static_gene_grid())
+            print(static_gene_grid()['p'])
             dev.off()
         }
     )
@@ -576,11 +585,28 @@ app_server <- function(input, output, session) {
 
     output$gene_grid <- renderPlot(
         {
-            print(static_gene_grid())
+            print(static_gene_grid()[['p']])
         },
         width = "auto",
         height = "auto"
     )
+
+    output$gene_grid_warnings <- renderText({
+        #   Since 'static_gene_grid()' is invoked twice (once also in the
+        #   assignment of 'output$gene_grid'), we silence any errors that occur
+        #   in this second invocation to not duplicate error messages
+        these_warnings = NULL
+        temp = try(
+            { these_warnings = static_gene_grid()[['gene_grid_warnings']] },
+            silent = TRUE
+        )
+
+        if (!is.null(these_warnings)) {
+            paste("Warnings:", paste(these_warnings, collapse = "; "))
+        } else {
+            ""
+        }
+    })
 
     output$editImg_plot <- renderPlot(
         {
