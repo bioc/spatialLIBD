@@ -224,7 +224,7 @@ app_server <- function(input, output, session) {
     })
 
     static_gene <- reactive({
-        gene_warnings = NULL
+        gene_warning = NULL
         withCallingHandlers({
             p <- vis_gene(
                 spe,
@@ -258,10 +258,10 @@ app_server <- function(input, output, session) {
                 )
             }
         }, warning = function(w) {
-            gene_warnings <<- c(gene_warnings, conditionMessage(w))
+            gene_warning <<- conditionMessage(w)
             invokeRestart("muffleWarning")
         })
-        return(list(p = p_result, gene_warnings = gene_warnings))
+        return(list(p = p_result, gene_warning = gene_warning))
     })
 
     static_gene_grid <- reactive({
@@ -455,7 +455,7 @@ app_server <- function(input, output, session) {
                 height = 8,
                 width = 8 * ifelse(input$side_by_side_gene, 2, 1)
             )
-            print(static_gene())
+            print(static_gene()[['p']])
             dev.off()
         }
     )
@@ -483,7 +483,7 @@ app_server <- function(input, output, session) {
                 height = 8 * isolate(input$gene_grid_nrow),
                 width = 8 * isolate(input$gene_grid_ncol)
             )
-            print(static_gene_grid()['p'])
+            print(static_gene_grid()[['p']])
             dev.off()
         }
     )
@@ -560,13 +560,13 @@ app_server <- function(input, output, session) {
         #   Since 'static_gene()' is invoked twice (once also in the assignment
         #   of 'output$gene'), we silence any errors that occur in this second
         #   invocation to not duplicate error messages
-        these_warnings = NULL
+        this_warning = NULL
         temp = try(
-            { these_warnings = static_gene()[['gene_warnings']] }, silent = TRUE
+            { this_warning = static_gene()[['gene_warning']] }, silent = TRUE
         )
 
-        if (!is.null(these_warnings)) {
-            paste("Warnings:", paste(these_warnings, collapse = "; "))
+        if (!is.null(this_warning)) {
+            paste("Warning:", this_warning)
         } else {
             ""
         }
