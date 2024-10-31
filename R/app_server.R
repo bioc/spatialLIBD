@@ -224,37 +224,44 @@ app_server <- function(input, output, session) {
     })
 
     static_gene <- reactive({
-        p <- vis_gene(
-            spe,
-            sampleid = input$sample,
-            geneid = input$geneid,
-            multi_gene_method = input$multi_gene_method,
-            assayname = input$assayname,
-            minCount = input$minCount,
-            cont_colors = cont_colors(),
-            image_id = input$imageid,
-            alpha = input$alphalevel,
-            point_size = input$pointsize,
-            auto_crop = input$auto_crop,
-            is_stitched = is_stitched
-        )
-        if (!input$side_by_side_gene) {
-            return(p)
-        } else {
-            p_no_spots <- p
-            p_no_spots$layers[[2]] <- NULL
-
-            p_no_spatial <- p
-            p_no_spatial$layers[[1]] <- NULL
-            cowplot::plot_grid(
-                plotlist = list(
-                    p_no_spots,
-                    p_no_spatial + ggplot2::theme(legend.position = "none")
-                ),
-                nrow = 1,
-                ncol = 2
+        gene_warnings = NULL
+        withCallingHandlers({
+            p <- vis_gene(
+                spe,
+                sampleid = input$sample,
+                geneid = input$geneid,
+                multi_gene_method = input$multi_gene_method,
+                assayname = input$assayname,
+                minCount = input$minCount,
+                cont_colors = cont_colors(),
+                image_id = input$imageid,
+                alpha = input$alphalevel,
+                point_size = input$pointsize,
+                auto_crop = input$auto_crop,
+                is_stitched = is_stitched
             )
-        }
+            if (!input$side_by_side_gene) {
+                p_result = p
+            } else {
+                p_no_spots <- p
+                p_no_spots$layers[[2]] <- NULL
+
+                p_no_spatial <- p
+                p_no_spatial$layers[[1]] <- NULL
+                p_result = cowplot::plot_grid(
+                    plotlist = list(
+                        p_no_spots,
+                        p_no_spatial + ggplot2::theme(legend.position = "none")
+                    ),
+                    nrow = 1,
+                    ncol = 2
+                )
+            }
+        }, warning = function(w) {
+            gene_warnings <<- c(gene_warnings, conditionMessage(w))
+            invokeRestart("muffleWarning")
+        })
+        return(list(p = p_result, gene_warnings = gene_warnings))
     })
 
     static_gene_grid <- reactive({
@@ -530,16 +537,24 @@ app_server <- function(input, output, session) {
         height = "auto"
     )
 
-
     output$gene <- renderPlot(
         {
-            static_gene()
+            static_gene()[['p']]
         },
         width = function() {
             600 * ifelse(input$side_by_side_gene, 2, 1)
         },
         height = 600
     )
+
+    output$gene_warnings <- renderText({
+        these_warnings = static_gene()[['gene_warnings']]
+        if (!is.null(these_warnings)) {
+            paste("Warnings:", paste(these_warnings, collapse = "; "))
+        } else {
+            ""
+        }
+    })
 
 
     output$gene_grid_static <- renderUI({

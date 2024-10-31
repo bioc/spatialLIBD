@@ -352,7 +352,8 @@ app_ui <- function() {
                                 tags$br(),
                                 tags$br(),
                                 tags$br(),
-                                tags$br()
+                                tags$br(),
+                                textOutput("gene_warnings")
                             ),
                             tabPanel(
                                 "Gene (interactive)",
