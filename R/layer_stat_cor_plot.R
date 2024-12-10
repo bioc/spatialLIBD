@@ -1,4 +1,4 @@
-#' Visualize the layer modeling correlation of statistics
+#' Visualize the correlation of layer modeling t-statistics
 #'
 #' This function makes a heatmap from the [layer_stat_cor()] correlation matrix
 #' between a given set of cell cluster/type statistics derived from scRNA-seq
