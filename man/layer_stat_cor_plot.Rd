@@ -2,7 +2,7 @@
 % Please edit documentation in R/layer_stat_cor_plot.R
 \name{layer_stat_cor_plot}
 \alias{layer_stat_cor_plot}
-\title{Visualize the layer modeling correlation of statistics}
+\title{Visualize the correlation of layer modeling t-statistics}
 \usage{
 layer_stat_cor_plot(
   cor_stats_layer,
