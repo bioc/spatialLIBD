@@ -21,8 +21,7 @@ commit](https://bioconductor.org/shields/lastcommit/devel/data-experiment/spatia
 dependencies](https://bioconductor.org/shields/dependencies/release/spatialLIBD.svg)](https://bioconductor.org/packages/release/data-experiment/html/spatialLIBD.html#since)
 [![Codecov test
 coverage](https://codecov.io/gh/LieberInstitute/spatialLIBD/branch/devel/graph/badge.svg)](https://codecov.io/gh/LieberInstitute/spatialLIBD?branch=devel)
-[![R build
-status](https://github.com/LieberInstitute/spatialLIBD/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/LieberInstitute/spatialLIBD/actions)
+[![R-CMD-check-bioc](https://github.com/LieberInstitute/spatialLIBD/actions/workflows/check-bioc.yml/badge.svg)](https://github.com/LieberInstitute/spatialLIBD/actions/workflows/check-bioc.yml)
 [![GitHub
 issues](https://img.shields.io/github/issues/LieberInstitute/spatialLIBD)](https://github.com/LieberInstitute/spatialLIBD/issues)
 [![GitHub
