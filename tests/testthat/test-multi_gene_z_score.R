@@ -11,17 +11,32 @@ test_that(
         )
 
         #   NAs should be correctly removed from columns (as long as 2 non-NAs remain
-        #   in at least 2 columns), and the result should have no NAs
+        #   in at least 1 column), and the result should have no NAs
         cont_mat <- matrix(c(1, NA, 3, NA, 2, 0), ncol = 2)
         colnames(cont_mat) <- c("good1", "good2")
         expect_equal(any(is.na(multi_gene_z_score(cont_mat))), FALSE)
 
-        #   With only one good column, an error should be thrown
+        #   With only one good column, the result should simply be the
+        #   Z-score-normalized good column. A warning should indicate which
+        #   columns were dropped
         cont_mat <- matrix(c(1, NA, 3, 4, 2, 2), ncol = 3)
         colnames(cont_mat) <- c("bad1", "good", "bad2")
+        
+        temp = c(3, 4)
+        expected_result = (temp - mean(temp)) / sd(temp)
+
+        expect_warning(
+            { actual_result = multi_gene_z_score(cont_mat) },
+            "Dropping features\\(s\\) 'bad1', 'bad2' which have no expression variation"
+        )
+        expect_equal(actual_result, expected_result)
+
+        #   An error should be thrown if no columns have variation
+        cont_mat <- matrix(c(1, 1, 0, 0, 2, 2), ncol = 3)
+        colnames(cont_mat) <- c("bad1", "bad2", "bad3")
         expect_error(
             multi_gene_z_score(cont_mat),
-            "After dropping features with no expression variation, less than 2 features were left"
+            "^After dropping features with no expression variation"
         )
     }
 )
