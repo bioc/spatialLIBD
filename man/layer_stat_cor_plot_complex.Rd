@@ -97,8 +97,9 @@ layer_stat_cor_plot_complex(cor_stats_layer, annotation = annotation_df)
 layer_stat_cor_plot_complex(cor_stats_layer, 
                             query_colors = cluster_colors,
                             reference_colors = libd_layer_colors, 
-                            annotation = annotation_df,
-                            rect_gp = gpar(col = "black", lwd = 1))
+                            annotation = annotation_df, 
+                            cluster_rows = FALSE, 
+                            cluster_columns = FALSE)
                             
 }
 \seealso{
