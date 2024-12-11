@@ -6,26 +6,45 @@
 \usage{
 layer_stat_cor_plot_complex(
   cor_stats_layer,
-  theSeq = seq(min(cor_stats_layer), max(cor_stats_layer), by = 0.01),
-  my.col = (grDevices::colorRampPalette(RColorBrewer::brewer.pal(7,
-    "PRGn")))(length(theSeq)),
+  color_max = max(cor_stats_layer),
+  color_min = min(cor_stats_layer),
+  color_scale = RColorBrewer::brewer.pal(7, "PRGn"),
   query_colors = NULL,
   reference_colors = NULL,
+  annotation = NULL,
   ...
 )
 }
 \arguments{
 \item{cor_stats_layer}{The output of \code{\link[=layer_stat_cor]{layer_stat_cor()}}.}
 
-\item{query_colors}{named vector of colors for query row annotations}
+\item{color_max}{A \code{numeric(1)} specifying the highest correlation value for
+the color scale (should be between 0 and 1).}
 
-\item{reference_colors}{named vector of colors for reference column annotations}
+\item{color_min}{A \code{numeric(1)} specifying the lowest correlation value for
+the color scale (should be between 0 and -1).}
+
+\item{color_scale}{A \code{character} vector specifying the color scale for the
+fill of the heatmap, defaults to classic purple -> green}
+
+\item{query_colors}{named \code{character} vector of colors, Adds colors to query
+row annotations}
+
+\item{reference_colors}{named \code{character} vector of colors, Adds colors to
+reference column annotations}
+
+\item{annotation}{annotation data.frame output of \code{\link[=annotate_registered_clusters]{annotate_registered_clusters()}},
+adds 'X' for good confidence annotations, '*' for poor confidence}
 }
 \value{
-ComplexHeatmap plot of t-stat correlations
+(\link[ComplexHeatmap:Heatmap-class]{Heatmap-class}) plot of t-stat correlations
 }
 \description{
-Visualize the correlation of layer modeling t-statistics with ComplexHeatmap
+This function updates \code{\link[=layer_stat_cor_plot]{layer_stat_cor_plot()}}, using ComplexHeatmap to plot
+the correlation matrix between a reference and query modeling statistics
+from \code{\link[=layer_stat_cor]{layer_stat_cor()}}. Includes functionality to add color annotations,
+(helpful to match to colors in Visium spot plots), and annotations from
+\code{\link[=annotate_registered_clusters]{annotate_registered_clusters()}}.
 }
 \examples{
 ## Obtain the necessary data
@@ -66,6 +85,27 @@ layer_stat_cor_plot_complex(cor_stats_layer,
                             reference_colors = libd_layer_colors)
 
 ## Apply additional ComplexHeatmap param
-layer_stat_cor_plot_complex(cor_stats_layer, cluster_rows = FALSE)
+layer_stat_cor_plot_complex(cor_stats_layer, cluster_rows = FALSE, cluster_columns = FALSE)
 
+## Add annotation
+annotation_df <- annotate_registered_clusters(cor_stats_layer, confidence_threshold = .55)
+layer_stat_cor_plot_complex(cor_stats_layer, annotation = annotation_df)
+
+## All together
+layer_stat_cor_plot_complex(cor_stats_layer, 
+                            query_colors = cluster_colors,
+                            reference_colors = libd_layer_colors, 
+                            annotation = annotation_df,
+                            rect_gp = gpar(col = "black", lwd = 1))
+                            
 }
+\seealso{
+Other Layer correlation functions: 
+\code{\link{annotate_registered_clusters}()},
+\code{\link{layer_stat_cor}()},
+\code{\link{layer_stat_cor_plot}()}
+}
+\author{
+Louise Huuki-Myers
+}
+\concept{Layer correlation functions}
