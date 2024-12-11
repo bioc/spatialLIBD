@@ -18,6 +18,7 @@
 #' reference column annotations
 #' @param annotation annotation data.frame output of [annotate_registered_clusters()],
 #' adds 'X' for good confidence annotations, '*' for poor confidence
+#' @param ... Additinal parameters passed to [ComplexHeatmap::Heatmap()][ComplexHeatmap::Heatmap()]
 #'
 #' @inheritParams layer_stat_cor_plot
 #'

@@ -35,6 +35,8 @@ reference column annotations}
 
 \item{annotation}{annotation data.frame output of \code{\link[=annotate_registered_clusters]{annotate_registered_clusters()}},
 adds 'X' for good confidence annotations, '*' for poor confidence}
+
+\item{...}{Additinal parameters passed to \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}}
 }
 \value{
 (\link[ComplexHeatmap:Heatmap-class]{Heatmap-class}) plot of t-stat correlations
