@@ -91,7 +91,8 @@ layer_matrix_plot annotate_registered_clusters
 
 Other Layer correlation functions: 
 \code{\link{annotate_registered_clusters}()},
-\code{\link{layer_stat_cor}()}
+\code{\link{layer_stat_cor}()},
+\code{\link{layer_stat_cor_plot_complex}()}
 }
 \author{
 Andrew E Jaffe, Leonardo Collado-Torres
