@@ -133,6 +133,7 @@ layer_stat_cor_plot_complex <- function(cor_stats_layer,
       ComplexHeatmap::Heatmap(
         matrix = cor_stats_layer,
         col = my.col,
+        name = "Cor",
         bottom_annotation = ref_col_annotation,
         right_annotation = query_row_annotation,
         cell_fun = function(j, i, x, y, width, height, fill) {
@@ -147,6 +148,7 @@ layer_stat_cor_plot_complex <- function(cor_stats_layer,
   ComplexHeatmap::Heatmap(
     matrix = cor_stats_layer,
     col = my.col,
+    name = "Cor",
     bottom_annotation = ref_col_annotation,
     right_annotation = query_row_annotation,
     ...
