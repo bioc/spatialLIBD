@@ -70,15 +70,22 @@ registration_pseudobulk <-
         stopifnot(!var_sample_id %in% covars)
         stopifnot(var_registration != var_sample_id)
 
-        ## Check that the values in the registration variable are ok
+        ## Check that the values in the registration variable are numeric
+        if(is.numeric(sce[[var_registration]])){
+          warning(sprintf("var_registration \"%s\" is numeric, convering to catagorial vector...", 
+                       var_registration))
+        }
+        
+        ## check for Non-Syntactic variables - convert with make.names & warn
         uniq_var_regis <- unique(sce[[var_registration]])
-        if (any(grepl("\\+|\\-", uniq_var_regis))) {
-            stop(
-                "Remove the + and - signs in colData(sce)[, '",
-                var_registration,
-                "'] to avoid downstream issues.",
-                call. = FALSE
+        syntatic <- grepl("^((([[:alpha:]]|[.][._[:alpha:]])[._[:alnum:]]*)|[.])$", uniq_var_regis)
+        if (!all(syntatic)) {
+            warning(sprintf("var_registration \"%s\" contains non-syntatic variables: %s\nconverting to %s",
+                         var_registration,
+                         paste(uniq_var_regis[!syntatic], collapse = ", "),
+                         paste(make.names(uniq_var_regis[!syntatic]), collapse = ", "))
             )
+                    sce[[var_registration]] <- make.names(sce[[var_registration]])
         }
 
         ## Pseudo-bulk for our current BayesSpace cluster results
