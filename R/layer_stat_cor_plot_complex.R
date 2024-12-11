@@ -61,7 +61,7 @@
 #' layer_stat_cor_plot_complex(cor_stats_layer, reference_colors = libd_layer_colors)
 #' 
 #' ## supply polychrome colors to query clusters
-#' cluster_colors <-  Polychrome::palette36.colors(nrow(cor_stats_layer))
+#' cluster_colors <-  c('#5A5156', '#E4E1E3', '#F6222E', '#FE00FA', '#16FF32', '#3283FE', '#FEAF16', '#B00068', '#1CFFCE')
 #' names(cluster_colors) <- rownames(cor_stats_layer)
 #'
 #' layer_stat_cor_plot_complex(cor_stats_layer, 
