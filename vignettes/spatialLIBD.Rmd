@@ -466,7 +466,7 @@ Once we have computed this correlation matrix, we can then visualize it using `l
 
 ```{r 'layer_stat_cor_plot', fig.wide = TRUE}
 ## Visualize the correlation matrix
-layer_stat_cor_plot(cor_stats_layer, max = max(cor_stats_layer))
+layer_stat_cor_plot(cor_stats_layer)
 ```
 
 In order to fully interpret the resulting heatmap you need to know what each of the cell clusters labels mean. In this case, the syntax is `xx (Y)` where `xx` is the cluster number and `Y` is:
