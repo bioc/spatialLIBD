@@ -6,6 +6,7 @@
 #' (helpful to match to colors in Visium spot plots), and annotations from 
 #' [annotate_registered_clusters()].
 #' 
+#' @param cor_stats_layer The output of [layer_stat_cor()].
 #' @param color_max A `numeric(1)` specifying the highest correlation value for 
 #' the color scale (should be between 0 and 1).
 #' @param color_min A `numeric(1)` specifying the lowest correlation value for 
@@ -18,9 +19,9 @@
 #' reference column annotations
 #' @param annotation annotation data.frame output of [annotate_registered_clusters()],
 #' adds 'X' for good confidence annotations, '*' for poor confidence
-#' @param ... Additinal parameters passed to [ComplexHeatmap::Heatmap()][ComplexHeatmap::Heatmap()]
+#' @param ... Additional parameters passed to [ComplexHeatmap::Heatmap()][ComplexHeatmap::Heatmap()]
+#' ex. `cluster_rows` and `cluster_columns`.
 #'
-#' @inheritParams layer_stat_cor_plot
 #'
 #' @return ([Heatmap-class][ComplexHeatmap::Heatmap-class]) plot of t-stat correlations
 #' @export
