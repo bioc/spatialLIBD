@@ -874,7 +874,7 @@ app_ui <- function() {
                                             max = 1,
                                             step = 0.01
                                         ),
-                                        helpText("Ratio the next closest correlation and the current one. Lower values are more strict in annotating. Default: 0.25.")
+                                        helpText("Merging threshold for the ratio of the difference between the current one to the next closest correlation, relative to the next closest correlation: (current - next_cor) / next_cor. Lower values are more strict in annotating. Default: 0.25.")
                                     )
                                 ),
                                 hr(),
