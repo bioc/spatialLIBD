@@ -79,7 +79,8 @@ Imports:
     statmod,
     MatrixGenerics,
     rlang,
-    dplyr
+    dplyr,
+    ComplexHeatmap
 RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 URL: https://github.com/LieberInstitute/spatialLIBD

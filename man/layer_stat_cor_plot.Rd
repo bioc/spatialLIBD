@@ -2,98 +2,115 @@
 % Please edit documentation in R/layer_stat_cor_plot.R
 \name{layer_stat_cor_plot}
 \alias{layer_stat_cor_plot}
-\title{Visualize the layer modeling correlation of statistics}
+\title{Visualize the correlation of layer modeling t-statistics with ComplexHeatmap}
 \usage{
 layer_stat_cor_plot(
   cor_stats_layer,
-  max = 0.81,
-  min = -max,
-  layerHeights = NULL,
-  cex = 1.2
+  color_max = max(cor_stats_layer),
+  color_min = min(cor_stats_layer),
+  color_scale = RColorBrewer::brewer.pal(7, "PRGn"),
+  query_colors = NULL,
+  reference_colors = NULL,
+  annotation = NULL,
+  ...
 )
 }
 \arguments{
 \item{cor_stats_layer}{The output of \code{\link[=layer_stat_cor]{layer_stat_cor()}}.}
 
-\item{max}{A \code{numeric(1)} specifying the highest correlation value for the
-color scale (should be between 0 and 1).}
+\item{color_max}{A \code{numeric(1)} specifying the highest correlation value for
+the color scale (should be between 0 and 1).}
 
-\item{min}{A \code{numeric(1)} specifying the lowest correlation value for the
-color scale (should be between 0 and -1).}
+\item{color_min}{A \code{numeric(1)} specifying the lowest correlation value for
+the color scale (should be between 0 and -1).}
 
-\item{layerHeights}{A \code{numeric()} vector of length equal to
-\code{ncol(cor_stats_layer) + 1} that starts at 0 specifying where
-to plot the y-axis breaks which can be used for re-creating the length of
-each brain layer. Gets passed to \code{\link[=layer_matrix_plot]{layer_matrix_plot()}}.}
+\item{color_scale}{A \code{character} vector specifying the color scale for the
+fill of the heatmap, defaults to classic purple -> green.}
 
-\item{cex}{Passed to \code{\link[=layer_matrix_plot]{layer_matrix_plot()}}.}
+\item{query_colors}{named \code{character} vector of colors, Adds colors to query
+row annotations.}
+
+\item{reference_colors}{named \code{character} vector of colors, Adds colors to
+reference column annotations.}
+
+\item{annotation}{annotation data.frame output of \code{\link[=annotate_registered_clusters]{annotate_registered_clusters()}},
+adds 'X' for good confidence annotations, '*' for poor confidence.}
+
+\item{...}{Additional parameters passed to \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}
+ex. \code{cluster_rows} and \code{cluster_columns}.}
 }
 \value{
-A heatmap for the correlation matrix between statistics.
+(\link[ComplexHeatmap:Heatmap-class]{Heatmap-class}) plot of t-stat correlations
 }
 \description{
-This function makes a heatmap from the \code{\link[=layer_stat_cor]{layer_stat_cor()}} correlation matrix
-between a given set of cell cluster/type statistics derived from scRNA-seq
-or snRNA-seq data (among other types) and the layer statistics from the
-Human DLPFC Visium data (when using the default arguments).
+Use ComplexHeatmap to plot the correlation matrix between a reference and
+query modeling statistics from \code{\link[=layer_stat_cor]{layer_stat_cor()}}.
 }
 \details{
-Check
-https://github.com/LieberInstitute/HumanPilot/blob/master/Analysis/Layer_Guesses/dlpfc_snRNAseq_annotation.R
-for a full analysis from which this family of functions is derived from.
+Includes functionality to add color annotations,
+(helpful to match to colors in Visium spot plots), and annotations from
+\code{\link[=annotate_registered_clusters]{annotate_registered_clusters()}}.
 }
 \examples{
-
 ## Obtain the necessary data
+## reference human pilot modeling results
 if (!exists("modeling_results")) {
     modeling_results <- fetch_data(type = "modeling_results")
 }
 
+## querey spatailDLPFC modeling 
+query_modeling_results <- fetch_data(type = "spatialDLPFC_Visium_modeling_results")
+
+## extract t-statics and rename
+registration_t_stats <- query_modeling_results$enrichment[, grep("^t_stat", colnames(query_modeling_results$enrichment))]
+colnames(registration_t_stats) <- gsub("^t_stat_", "", colnames(registration_t_stats))
+
 ## Compute the correlations
 cor_stats_layer <- layer_stat_cor(
-    tstats_Human_DLPFC_snRNAseq_Nguyen_topLayer,
+    stats = registration_t_stats,
     modeling_results,
     model_type = "enrichment"
 )
 
 ## Visualize the correlation matrix
-layer_stat_cor_plot(cor_stats_layer, max = max(cor_stats_layer))
 
-## Annotate then re-plot
-rownames(cor_stats_layer) <- paste0(
-    rownames(cor_stats_layer),
-    " - ",
-    annotate_registered_clusters(cor_stats_layer)$layer_label
-)
-layer_stat_cor_plot(cor_stats_layer, max = max(cor_stats_layer))
+## most basic
+layer_stat_cor_plot(cor_stats_layer)
 
-## Restrict the range of colors further
-layer_stat_cor_plot(cor_stats_layer, max = 0.25)
+## add colors
+## add libd_layer_colors to refrence Human Pilot layers
+layer_stat_cor_plot(cor_stats_layer, reference_colors = libd_layer_colors)
 
-## Repeat with just the top 10 layer marker genes
-layer_stat_cor_plot(layer_stat_cor(
-    tstats_Human_DLPFC_snRNAseq_Nguyen_topLayer,
-    modeling_results,
-    model_type = "enrichment",
-    top_n = 10
-), max = 0.25)
+## supply polychrome colors to query clusters
+cluster_colors <-  c('#5A5156', '#E4E1E3', '#F6222E', '#FE00FA', '#16FF32', '#3283FE', '#FEAF16', '#B00068', '#1CFFCE')
+names(cluster_colors) <- rownames(cor_stats_layer)
 
-## Now with the "pairwise" modeling results and also top_n = 10
-layer_stat_cor_plot(layer_stat_cor(
-    tstats_Human_DLPFC_snRNAseq_Nguyen_topLayer,
-    modeling_results,
-    model_type = "pairwise",
-    top_n = 10
-), max = 0.25)
+layer_stat_cor_plot(cor_stats_layer, 
+                            query_colors = cluster_colors,
+                            reference_colors = libd_layer_colors)
+
+## Apply additional ComplexHeatmap param
+layer_stat_cor_plot(cor_stats_layer, cluster_rows = FALSE, cluster_columns = FALSE)
+
+## Add annotation
+annotation_df <- annotate_registered_clusters(cor_stats_layer, confidence_threshold = .55)
+layer_stat_cor_plot(cor_stats_layer, annotation = annotation_df)
+
+## All together
+layer_stat_cor_plot(cor_stats_layer, 
+                            query_colors = cluster_colors,
+                            reference_colors = libd_layer_colors, 
+                            annotation = annotation_df, 
+                            cluster_rows = FALSE, 
+                            cluster_columns = FALSE)
+                            
 }
 \seealso{
-layer_matrix_plot annotate_registered_clusters
-
 Other Layer correlation functions: 
 \code{\link{annotate_registered_clusters}()},
 \code{\link{layer_stat_cor}()}
 }
 \author{
-Andrew E Jaffe, Leonardo Collado-Torres
+Louise Huuki-Myers
 }
 \concept{Layer correlation functions}

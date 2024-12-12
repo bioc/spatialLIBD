@@ -59,13 +59,6 @@ annotate_registered_clusters <-
                 cutoff_merge_ratio = cutoff_merge_ratio
             )
 
-        if (all(colnames(cor_stats_layer) %in% c("WM", paste0("Layer", seq_len(6))))) {
-            ## Simplify names when working with the default data
-            annotated <- gsub("ayer", "", annotated)
-            annotated <- gsub("\\/L", "\\/", annotated)
-            annotated <- gsub("^WM\\/", "WM\\/L", annotated)
-        }
-
         confidence <- apply(cor_stats_layer, 1, max) > confidence_threshold
 
         result <- data.frame(
@@ -83,6 +76,16 @@ annotate_registered_clusters <-
                 result$layer_label,
                 ifelse(result$layer_confidence == "good", "", "*")
             )
+        
+        ## Add simplified label for WM/Layer annotations
+        if (all(colnames(cor_stats_layer) %in% c("WM", paste0("Layer", seq_len(6))))) {
+            result$layer_label_simple <- result$layer_label
+            ## Simplify names when working with the default data
+            result$layer_label_simple  <- gsub("ayer", "", result$layer_label_simple )
+            result$layer_label_simple  <- gsub("\\/L", "\\/", result$layer_label_simple )
+            result$layer_label_simple  <- gsub("^WM\\/", "WM\\/L", result$layer_label_simple )
+        }
+        
         return(result)
     }
 
