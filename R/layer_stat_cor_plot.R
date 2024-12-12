@@ -47,28 +47,21 @@
 #'     modeling_results <- fetch_data(type = "modeling_results")
 #' }
 #'
-#' ## querey spatailDLPFC modeling
+#' ## query spatialDLPFC modeling results
 #' query_modeling_results <- fetch_data(
 #'     type = "spatialDLPFC_Visium_modeling_results"
 #' )
 #'
-#' ## extract t-statics and rename
-#' registration_t_stats <- query_modeling_results$enrichment[,
-#'     grep("^t_stat", colnames(query_modeling_results$enrichment))]
-#' colnames(registration_t_stats) <- gsub(
-#'     "^t_stat_", "", colnames(registration_t_stats)
-#' )
-#'
 #' ## Compute the correlations
 #' cor_stats_layer <- layer_stat_cor(
-#'     stats = registration_t_stats,
+#'     stats = query_modeling_results$enrichment,
 #'     modeling_results,
 #'     model_type = "enrichment"
 #' )
 #'
 #' ## Visualize the correlation matrix
 #'
-#' ## most basic
+#' ## Default plot with no annotations and defaults for ComplexHeatmap()
 #' layer_stat_cor_plot(cor_stats_layer)
 #'
 #' ## add colors

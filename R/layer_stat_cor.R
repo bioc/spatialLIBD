@@ -1,19 +1,24 @@
 #' Layer modeling correlation of statistics
 #'
-#' @param stats A data.frame where the row names are Ensembl gene IDs, the
-#' column names are labels for clusters of cells or cell types, and where
+#' @param stats A query `data.frame` where the row names are ENSEMBL gene IDs,
+#' the column names are labels for clusters of cells or cell types, and where
 #' each cell contains the given statistic for that gene and cell type. These
 #' statistics should be computed similarly to the modeling results from
 #' the data we provide. For example, like the `enrichment` t-statistics that
 #' are derived from comparing one layer against the rest. The `stats` will be
-#' matched and then correlated with our statistics.
+#' matched and then correlated with the reference statistics.
+#'
+#' If using the output of `registration_wrapper()` then use `$enrichment` to
+#' access the results from `registration_stats_enrichment()`. This function will
+#' automatically extract the statistics and assign the ENSEMBL gene IDs to the
+#' row names of the query matrix.
 #' @inheritParams sig_genes_extract
 #' @param top_n An `integer(1)` specifying whether to filter to the top n marker
 #' genes. The default is `NULL` in which case no filtering is done.
 #'
-#' @return A correlation matrix between `stats` and our statistics using only
-#' the Ensembl gene IDs present in both tables. The columns are sorted using
-#' a hierarchical cluster.
+#' @return A correlation matrix between the query `stats` and the reference
+#' statistics using only the ENSEMBL gene IDs present in both tables.
+#' The columns are sorted using hierarchical clustering.
 #'
 #' @export
 #' @importFrom stats cor dist hclust
@@ -61,6 +66,19 @@ layer_stat_cor <-
             model_results[, grep("[f|t]_stat_", colnames(model_results))]
         colnames(tstats) <-
             gsub("[f|t]_stat_", "", colnames(tstats))
+
+        ## Use the 'ensembl' column for gene names if present in 'stats'
+        if ("ensembl" %in% colnames(stats)) {
+            rownames(stats) <- stats$ensembl
+        }
+
+        ## Do the same for stats
+        if (any(grepl("[f|t]_stat_", colnames(stats)))) {
+            stats <-
+            stats[, grep("[f|t]_stat_", colnames(stats))]
+        colnames(stats) <-
+            gsub("[f|t]_stat_", "", colnames(stats))
+        }
 
         if (reverse) {
             tstats <- tstats * -1
