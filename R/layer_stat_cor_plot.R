@@ -1,8 +1,9 @@
 #' Visualize the correlation of layer modeling t-statistics with ComplexHeatmap
 #' 
-#' This function updates [layer_stat_cor_plot()], using ComplexHeatmap to plot
-#' the correlation matrix between a reference and query modeling statistics 
-#' from [layer_stat_cor()]. Includes functionality to add color annotations, 
+#' Use ComplexHeatmap to plot the correlation matrix between a reference and 
+#' query modeling statistics from [layer_stat_cor()]. 
+#' 
+#' Includes functionality to add color annotations, 
 #' (helpful to match to colors in Visium spot plots), and annotations from 
 #' [annotate_registered_clusters()].
 #' 
@@ -12,13 +13,13 @@
 #' @param color_min A `numeric(1)` specifying the lowest correlation value for 
 #' the color scale (should be between 0 and -1).
 #' @param color_scale A `character` vector specifying the color scale for the 
-#' fill of the heatmap, defaults to classic purple -> green
+#' fill of the heatmap, defaults to classic purple -> green.
 #' @param query_colors named `character` vector of colors, Adds colors to query 
-#' row annotations
+#' row annotations.
 #' @param reference_colors named `character` vector of colors, Adds colors to 
-#' reference column annotations
+#' reference column annotations.
 #' @param annotation annotation data.frame output of [annotate_registered_clusters()],
-#' adds 'X' for good confidence annotations, '*' for poor confidence
+#' adds 'X' for good confidence annotations, '*' for poor confidence.
 #' @param ... Additional parameters passed to [ComplexHeatmap::Heatmap()][ComplexHeatmap::Heatmap()]
 #' ex. `cluster_rows` and `cluster_columns`.
 #'
@@ -56,29 +57,29 @@
 #' ## Visualize the correlation matrix
 #' 
 #' ## most basic
-#' layer_stat_cor_plot_complex(cor_stats_layer)
+#' layer_stat_cor_plot(cor_stats_layer)
 #' 
 #' ## add colors
 #' ## add libd_layer_colors to refrence Human Pilot layers
-#' layer_stat_cor_plot_complex(cor_stats_layer, reference_colors = libd_layer_colors)
+#' layer_stat_cor_plot(cor_stats_layer, reference_colors = libd_layer_colors)
 #' 
 #' ## supply polychrome colors to query clusters
 #' cluster_colors <-  c('#5A5156', '#E4E1E3', '#F6222E', '#FE00FA', '#16FF32', '#3283FE', '#FEAF16', '#B00068', '#1CFFCE')
 #' names(cluster_colors) <- rownames(cor_stats_layer)
 #'
-#' layer_stat_cor_plot_complex(cor_stats_layer, 
+#' layer_stat_cor_plot(cor_stats_layer, 
 #'                             query_colors = cluster_colors,
 #'                             reference_colors = libd_layer_colors)
 #' 
 #' ## Apply additional ComplexHeatmap param
-#' layer_stat_cor_plot_complex(cor_stats_layer, cluster_rows = FALSE, cluster_columns = FALSE)
+#' layer_stat_cor_plot(cor_stats_layer, cluster_rows = FALSE, cluster_columns = FALSE)
 #' 
 #' ## Add annotation
 #' annotation_df <- annotate_registered_clusters(cor_stats_layer, confidence_threshold = .55)
-#' layer_stat_cor_plot_complex(cor_stats_layer, annotation = annotation_df)
+#' layer_stat_cor_plot(cor_stats_layer, annotation = annotation_df)
 #' 
 #' ## All together
-#' layer_stat_cor_plot_complex(cor_stats_layer, 
+#' layer_stat_cor_plot(cor_stats_layer, 
 #'                             query_colors = cluster_colors,
 #'                             reference_colors = libd_layer_colors, 
 #'                             annotation = annotation_df, 
