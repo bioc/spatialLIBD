@@ -40,12 +40,13 @@ test_that(
 ## catagorical var as int
 sce$cluster_int <- sample(1:4, ncol(sce), replace = TRUE)
 # sce$cluster_k <- paste0("k", sce$cluster_int)
-sce$cluster_j <- paste0(sce$cluster_int,"j")
+sce$cluster_j <- paste0(sce$cluster_int, "j")
 sce$cluster_l <- sample(c("L-1", "L2/3", "4L", "L5"), ncol(sce), replace = TRUE)
 
 table(sce$cluster_j)
 
-test_that("Numeric var_regisration throws warning",
+test_that(
+    "Numeric var_regisration throws warning",
     expect_warning(
         registration_wrapper(
             sce,
@@ -56,9 +57,11 @@ test_that("Numeric var_regisration throws warning",
             gene_name = "gene_name",
             suffix = "wrapper"
         )
-    ))
+    )
+)
 
-test_that("Non-Syntactic throws warning",
+test_that(
+    "Non-Syntactic throws warning",
     expect_warning(
         registration_wrapper(
             sce,
@@ -69,12 +72,5 @@ test_that("Non-Syntactic throws warning",
             gene_name = "gene_name",
             suffix = "wrapper"
         )
-    ))
-
-
-
-
-
-
-
-
+    )
+)
