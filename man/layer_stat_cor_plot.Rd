@@ -108,8 +108,7 @@ layer_stat_cor_plot(cor_stats_layer,
 \seealso{
 Other Layer correlation functions: 
 \code{\link{annotate_registered_clusters}()},
-\code{\link{layer_stat_cor}()},
-\code{\link{layer_stat_cor_plot_complex}()}
+\code{\link{layer_stat_cor}()}
 }
 \author{
 Louise Huuki-Myers

@@ -86,8 +86,7 @@ summary(layer_stat_cor(
 \seealso{
 Other Layer correlation functions: 
 \code{\link{annotate_registered_clusters}()},
-\code{\link{layer_stat_cor_plot}()},
-\code{\link{layer_stat_cor_plot_complex}()}
+\code{\link{layer_stat_cor_plot}()}
 }
 \author{
 Andrew E Jaffe, Leonardo Collado-Torres
