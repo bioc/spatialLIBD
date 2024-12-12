@@ -1468,6 +1468,14 @@ app_server <- function(input, output, session) {
         layer_stat_cor(input_stat, modeling_results, input$layer_model)
     })
 
+    static_layer_external_tstat_annotated_clusters <- reactive({
+        annotate_registered_clusters(
+            static_layer_external_tstat(),
+            input$layer_confidence_threshold,
+            input$layer_cutoff_merge_ratio
+        )
+    })
+
     static_layer_external_tstat_plot <- reactive({
         layer_stat_cor_plot(
             static_layer_external_tstat(),
@@ -1475,11 +1483,7 @@ app_server <- function(input, output, session) {
             -max(c(0.1, input$layer_tstat_max)),
             cluster_rows = FALSE,
             cluster_columns = FALSE,
-            annotation = annotate_registered_clusters(
-                static_layer_external_tstat(),
-                input$layer_confidence_threshold,
-                input$layer_cutoff_merge_ratio
-            ),
+            annotation = static_layer_external_tstat_annotated_clusters(),
             query_colors = get_colors(
                 clusters = rownames(static_layer_external_tstat())
             ),
@@ -1873,6 +1877,30 @@ app_server <- function(input, output, session) {
         content = function(file) {
             write.csv(
                 static_layer_external_tstat(),
+                file = file,
+                quote = FALSE,
+                row.names = TRUE
+            )
+        }
+    )
+
+    output$layer_downloadTstatCor_annotation <- downloadHandler(
+        filename = function() {
+            gsub(
+                " ",
+                "_",
+                paste0(
+                    "spatialLIBD_layer_TstatCor_annotated_clusters_",
+                    input$layer_model,
+                    "_",
+                    Sys.time(),
+                    ".csv"
+                )
+            )
+        },
+        content = function(file) {
+            write.csv(
+                static_layer_external_tstat_annotated_clusters(),
                 file = file,
                 quote = FALSE,
                 row.names = TRUE

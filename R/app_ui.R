@@ -896,6 +896,8 @@ app_ui <- function() {
                                 hr(),
                                 downloadButton("layer_downloadTstatCorTable", "Download CSV"),
                                 helpText("Correlation matrix that is visually illustrated with the previous plot."),
+                                downloadButton("layer_downloadTstatCor_annotation", "Download CSV"),
+                                helpText("Annotated clusters."),
                                 DT::DTOutput("layer_tstat_cor_table")
                             )
                         )
