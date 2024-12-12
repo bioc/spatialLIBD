@@ -29,7 +29,7 @@ sce$batch <- "batch1"
 
 ## non-syntactic inputs
 sce$cluster_int <- sample(1:4, ncol(sce), replace = TRUE)
-sce$cluster_k <- paste0("k", sce$cluster_int)
+# sce$cluster_k <- paste0("k", sce$cluster_int)
 sce$cluster_j <- paste0(sce$cluster_int,"j")
 sce$cluster_l <- sample(c("L-1", "L2/3", "4L", "L5"), ncol(sce), replace = TRUE)
 
