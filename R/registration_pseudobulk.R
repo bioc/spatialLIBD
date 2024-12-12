@@ -8,8 +8,8 @@
 #' object or one that inherits its properties.
 #' @param var_registration A `character(1)` specifying the `colData(sce)`
 #' variable of interest against which will be used for computing the relevant
-#' statistics. This should be a categorical variable, with all categories 
-#' syntaticly valid (could be used as an R variable, no special characters or 
+#' statistics. This should be a categorical variable, with all categories
+#' syntaticly valid (could be used as an R variable, no special characters or
 #' leading numbers), ex. 'L1.2', 'celltype2' not 'L1/2' or '2'.
 #' @param var_sample_id A `character(1)` specifying the `colData(sce)` variable
 #' with the sample ID.
@@ -74,21 +74,31 @@ registration_pseudobulk <-
         stopifnot(var_registration != var_sample_id)
 
         ## Check that the values in the registration variable are numeric
-        if(is.numeric(sce[[var_registration]])){
-          warning(sprintf("var_registration \"%s\" is numeric, convering to catagorial vector...", 
-                       var_registration))
+        if (is.numeric(sce[[var_registration]])) {
+            warning(
+                sprintf(
+                    "var_registration \"%s\" is numeric, convering to categorical vector...",
+                    var_registration
+                ),
+                call. = FALSE
+            )
         }
-        
+
         ## check for Non-Syntactic variables - convert with make.names & warn
         uniq_var_regis <- unique(sce[[var_registration]])
-        syntatic <- grepl("^((([[:alpha:]]|[.][._[:alpha:]])[._[:alnum:]]*)|[.])$", uniq_var_regis)
+        syntatic <- grepl("^((([[:alpha:]]|[.][._[:alpha:]])[._[:alnum:]]*)|[.])$",
+            uniq_var_regis)
         if (!all(syntatic)) {
-            warning(sprintf("var_registration \"%s\" contains non-syntatic variables: %s\nconverting to %s",
-                         var_registration,
-                         paste(uniq_var_regis[!syntatic], collapse = ", "),
-                         paste(make.names(uniq_var_regis[!syntatic]), collapse = ", "))
+            warning(
+                sprintf(
+                    "var_registration \"%s\" contains non-syntatic variables: %s\nconverting to %s",
+                    var_registration,
+                    paste(uniq_var_regis[!syntatic], collapse = ", "),
+                    paste(make.names(uniq_var_regis[!syntatic]), collapse = ", ")
+                ),
+                call. = FALSE
             )
-                    sce[[var_registration]] <- make.names(sce[[var_registration]])
+            sce[[var_registration]] <- make.names(sce[[var_registration]])
         }
 
         ## Pseudo-bulk for our current BayesSpace cluster results
