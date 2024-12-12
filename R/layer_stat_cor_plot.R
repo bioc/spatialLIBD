@@ -2,10 +2,10 @@
 #'
 #' This function makes a ComplexHeatmap from the correlation matrix
 #' between a reference and query modeling statistics from [layer_stat_cor()].
-#' For example, between the query statistics from a set of cell cluster/types derived
-#' from scRNA-seq or snRNA-seq data (among other types) and the reference layer
-#' statistics from the Human DLPFC Visium data (when using the default
-#' arguments).
+#' For example, between the query statistics from a set of cell cluster/types
+#' derived from scRNA-seq or snRNA-seq data (among other types) and the
+#' reference layer statistics from the Human DLPFC Visium data (when using the
+#' default arguments).
 #'
 #' Includes functionality to add color annotations,
 #' (helpful to match to colors in Visium spot plots), and annotations from
@@ -22,13 +22,16 @@
 #' row annotations.
 #' @param reference_colors named `character` vector of colors, Adds colors to
 #' reference column annotations.
-#' @param annotation annotation data.frame output of [annotate_registered_clusters()],
-#' adds 'X' for good confidence annotations, '*' for poor confidence.
-#' @param ... Additional parameters passed to [ComplexHeatmap::Heatmap()][ComplexHeatmap::Heatmap()]
-#' ex. `cluster_rows` and `cluster_columns`.
+#' @param annotation annotation data.frame output of
+#' [annotate_registered_clusters()], adds 'X' for good confidence annotations,
+#' '*' for poor confidence.
+#' @param ... Additional parameters passed to
+#' [ComplexHeatmap::Heatmap()][ComplexHeatmap::Heatmap()] such as `cluster_rows`
+#' and `cluster_columns`.
 #'
 #'
-#' @return ([Heatmap-class][ComplexHeatmap::Heatmap-class]) plot of t-stat correlations
+#' @return ([Heatmap-class][ComplexHeatmap::Heatmap-class]) plot of t-stat
+#' correlations
 #' @export
 #' @author Louise Huuki-Myers
 #' @family Layer correlation functions
@@ -45,11 +48,16 @@
 #' }
 #'
 #' ## querey spatailDLPFC modeling
-#' query_modeling_results <- fetch_data(type = "spatialDLPFC_Visium_modeling_results")
+#' query_modeling_results <- fetch_data(
+#'     type = "spatialDLPFC_Visium_modeling_results"
+#' )
 #'
 #' ## extract t-statics and rename
-#' registration_t_stats <- query_modeling_results$enrichment[, grep("^t_stat", colnames(query_modeling_results$enrichment))]
-#' colnames(registration_t_stats) <- gsub("^t_stat_", "", colnames(registration_t_stats))
+#' registration_t_stats <- query_modeling_results$enrichment[,
+#'     grep("^t_stat", colnames(query_modeling_results$enrichment))]
+#' colnames(registration_t_stats) <- gsub(
+#'     "^t_stat_", "", colnames(registration_t_stats)
+#' )
 #'
 #' ## Compute the correlations
 #' cor_stats_layer <- layer_stat_cor(
@@ -64,31 +72,48 @@
 #' layer_stat_cor_plot(cor_stats_layer)
 #'
 #' ## add colors
-#' ## add libd_layer_colors to refrence Human Pilot layers
+#' ## add libd_layer_colors to reference Human Pilot layers
 #' layer_stat_cor_plot(cor_stats_layer, reference_colors = libd_layer_colors)
 #'
 #' ## supply polychrome colors to query clusters
-#' cluster_colors <-  c('#5A5156', '#E4E1E3', '#F6222E', '#FE00FA', '#16FF32', '#3283FE', '#FEAF16', '#B00068', '#1CFFCE')
+#' cluster_colors <-  c(
+#'     '#5A5156',
+#'     '#E4E1E3',
+#'     '#F6222E',
+#'     '#FE00FA',
+#'     '#16FF32',
+#'     '#3283FE',
+#'     '#FEAF16',
+#'     '#B00068',
+#'     '#1CFFCE'
+#' )
 #' names(cluster_colors) <- rownames(cor_stats_layer)
 #'
 #' layer_stat_cor_plot(cor_stats_layer,
-#'                             query_colors = cluster_colors,
-#'                             reference_colors = libd_layer_colors)
+#'     query_colors = cluster_colors,
+#'     reference_colors = libd_layer_colors)
 #'
 #' ## Apply additional ComplexHeatmap param
-#' layer_stat_cor_plot(cor_stats_layer, cluster_rows = FALSE, cluster_columns = FALSE)
+#' layer_stat_cor_plot(cor_stats_layer,
+#'     cluster_rows = FALSE,
+#'     cluster_columns = FALSE)
 #'
 #' ## Add annotation
-#' annotation_df <- annotate_registered_clusters(cor_stats_layer, confidence_threshold = .55)
+#' annotation_df <- annotate_registered_clusters(
+#'     cor_stats_layer,
+#'     confidence_threshold = .55
+#' )
 #' layer_stat_cor_plot(cor_stats_layer, annotation = annotation_df)
 #'
 #' ## All together
-#' layer_stat_cor_plot(cor_stats_layer,
-#'                             query_colors = cluster_colors,
-#'                             reference_colors = libd_layer_colors,
-#'                             annotation = annotation_df,
-#'                             cluster_rows = FALSE,
-#'                             cluster_columns = FALSE)
+#' layer_stat_cor_plot(
+#'     cor_stats_layer,
+#'     query_colors = cluster_colors,
+#'     reference_colors = libd_layer_colors,
+#'     annotation = annotation_df,
+#'     cluster_rows = FALSE,
+#'     cluster_columns = FALSE
+#' )
 #'
 layer_stat_cor_plot <- function(cor_stats_layer,
                                         max = max(cor_stats_layer),
