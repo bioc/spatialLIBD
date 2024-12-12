@@ -239,16 +239,10 @@ sce_modeling_results <- registration_wrapper(
 ```
 
 ## Extract Enrichment t-statistics
+
 ```{r "extract_t_stats"}
-## extract t-statics and rename
-registration_t_stats <- sce_modeling_results$enrichment[, grep("^t_stat", colnames(sce_modeling_results$enrichment))]
-colnames(registration_t_stats) <- gsub("^t_stat_", "", colnames(registration_t_stats))
-
-## cell types x gene
-dim(registration_t_stats)
-
-## check out table
-registration_t_stats[1:5, 1:5]
+## check out table on enrichment t-statistics
+sce_modeling_results$enrichment[1:5, 1:5]
 ```
 
 
@@ -256,7 +250,7 @@ registration_t_stats[1:5, 1:5]
 
 ```{r "layer_stat_cor"}
 cor_layer <- layer_stat_cor(
-    stats = registration_t_stats,
+    stats = sce_modeling_results$enrichment,
     modeling_results = layer_modeling_results,
     model_type = "enrichment",
     top_n = 100
@@ -299,6 +293,22 @@ anno <- annotate_registered_clusters(
 )
 
 anno
+```
+
+## Plot Annotated Cell Types
+
+Finally, we can update our heatmap with colors and annotations based on cluster
+registration for the snRNA-seq clusters.
+
+```{r "plot_anno"}
+layer_stat_cor_plot(
+    cor_layer,
+    query_colors = get_colors(clusters = rownames(cor_layer)),
+    reference_colors = libd_layer_colors,
+    annotation = anno,
+    cluster_rows = FALSE,
+    cluster_columns = FALSE
+)
 ```
 
 
