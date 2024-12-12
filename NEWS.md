@@ -1,3 +1,12 @@
+# spatialLIBD 1.19.2
+
+BUG FIXES
+
+* Merged <https://github.com/LieberInstitute/spatialLIBD/pull/92> by @lahuuki.
+This fixes https://github.com/LieberInstitute/spatialLIBD/issues/72 and
+https://github.com/LieberInstitute/spatialLIBD/issues/48 by making 
+`registration_pseudobulk()` more robust.
+
 # spatialLIBD 1.19.1
 
 NEW FEATURES
