@@ -12,9 +12,9 @@
 #' [annotate_registered_clusters()].
 #'
 #' @param cor_stats_layer The output of [layer_stat_cor()].
-#' @param color_max A `numeric(1)` specifying the highest correlation value for
+#' @param max A `numeric(1)` specifying the highest correlation value for
 #' the color scale (should be between 0 and 1).
-#' @param color_min A `numeric(1)` specifying the lowest correlation value for
+#' @param min A `numeric(1)` specifying the lowest correlation value for
 #' the color scale (should be between 0 and -1).
 #' @param color_scale A `character` vector specifying the color scale for the
 #' fill of the heatmap, defaults to classic purple -> green.
@@ -91,8 +91,8 @@
 #'                             cluster_columns = FALSE)
 #'
 layer_stat_cor_plot <- function(cor_stats_layer,
-                                        color_max = max(cor_stats_layer),
-                                        color_min = min(cor_stats_layer),
+                                        max = max(cor_stats_layer),
+                                        min = min(cor_stats_layer),
                                         color_scale = RColorBrewer::brewer.pal(7, "PRGn"),
                                         query_colors = NULL,
                                         reference_colors = NULL,
@@ -101,7 +101,7 @@ layer_stat_cor_plot <- function(cor_stats_layer,
 ){
 
   ## define color pallet
-  theSeq = seq(color_min, color_max, by = 0.01)
+  theSeq = seq(min, max, by = 0.01)
   my.col = grDevices::colorRampPalette(color_scale)(length(theSeq))
 
   # ## query annotations on row
