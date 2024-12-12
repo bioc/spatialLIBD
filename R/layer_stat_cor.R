@@ -54,12 +54,11 @@
 #'     top_n = 10
 #' ))
 layer_stat_cor <-
-    function(
-        stats,
-        modeling_results = fetch_data(type = "modeling_results"),
-        model_type = names(modeling_results)[1],
-        reverse = FALSE,
-        top_n = NULL) {
+    function(stats,
+    modeling_results = fetch_data(type = "modeling_results"),
+    model_type = names(modeling_results)[1],
+    reverse = FALSE,
+    top_n = NULL) {
         model_results <- modeling_results[[model_type]]
 
         tstats <-
@@ -75,9 +74,9 @@ layer_stat_cor <-
         ## Do the same for stats
         if (any(grepl("[f|t]_stat_", colnames(stats)))) {
             stats <-
-            stats[, grep("[f|t]_stat_", colnames(stats))]
-        colnames(stats) <-
-            gsub("[f|t]_stat_", "", colnames(stats))
+                stats[, grep("[f|t]_stat_", colnames(stats))]
+            colnames(stats) <-
+                gsub("[f|t]_stat_", "", colnames(stats))
         }
 
         if (reverse) {

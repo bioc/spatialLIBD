@@ -45,7 +45,8 @@ set.seed(20240712)
 log_var <- sample(c(TRUE, FALSE, NA),
     1000,
     replace = TRUE,
-    prob = c(0.3, 0.15, 0.55))
+    prob = c(0.3, 0.15, 0.55)
+)
 log_var_sorted <- sort_clusters(log_var)
 ## A color does get assigned to 'NA', but will be overwritten by
 ## 'na_color' passed to `vis_clus_p()` and related functions.

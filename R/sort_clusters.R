@@ -52,7 +52,8 @@
 #' log_var <- sample(c(TRUE, FALSE, NA),
 #'     1000,
 #'     replace = TRUE,
-#'     prob = c(0.3, 0.15, 0.55))
+#'     prob = c(0.3, 0.15, 0.55)
+#' )
 #' ## Here, the NAs are the most frequent group.
 #' table(log_var, useNA = "ifany")
 #'

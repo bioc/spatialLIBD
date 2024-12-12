@@ -72,12 +72,14 @@
 #' cluster_colors <- get_colors(clusters = rownames(cor_stats_layer))
 #' layer_stat_cor_plot(cor_stats_layer,
 #'     query_colors = cluster_colors,
-#'     reference_colors = libd_layer_colors)
+#'     reference_colors = libd_layer_colors
+#' )
 #'
 #' ## Apply additional ComplexHeatmap param
 #' layer_stat_cor_plot(cor_stats_layer,
 #'     cluster_rows = FALSE,
-#'     cluster_columns = FALSE)
+#'     cluster_columns = FALSE
+#' )
 #'
 #' ## Add annotation
 #' annotation_df <- annotate_registered_clusters(
@@ -97,96 +99,95 @@
 #' )
 #'
 layer_stat_cor_plot <- function(cor_stats_layer,
-                                        color_max = max(cor_stats_layer),
-                                        color_min = min(cor_stats_layer),
-                                        color_scale = RColorBrewer::brewer.pal(7, "PRGn"),
-                                        query_colors = NULL,
-                                        reference_colors = NULL,
-                                        annotation = NULL,
-                                        ...
-){
+    color_max = max(cor_stats_layer),
+    color_min = min(cor_stats_layer),
+    color_scale = RColorBrewer::brewer.pal(7, "PRGn"),
+    query_colors = NULL,
+    reference_colors = NULL,
+    annotation = NULL,
+    ...) {
+    ## define color pallet
+    theSeq <- seq(color_min, color_max, by = 0.01)
+    my.col <- grDevices::colorRampPalette(color_scale)(length(theSeq))
 
-  ## define color pallet
-  theSeq = seq(color_min, color_max, by = 0.01)
-  my.col = grDevices::colorRampPalette(color_scale)(length(theSeq))
-
-  # ## query annotations on row
-  if(!is.null(query_colors)){
-
-    stopifnot(all(rownames(cor_stats_layer) %in% names(query_colors)))
-    query_colors <- query_colors[rownames(cor_stats_layer)]
+    # ## query annotations on row
+    if (!is.null(query_colors)) {
+        stopifnot(all(rownames(cor_stats_layer) %in% names(query_colors)))
+        query_colors <- query_colors[rownames(cor_stats_layer)]
 
 
-    query_row_annotation <- ComplexHeatmap::rowAnnotation(
-      " " = rownames(cor_stats_layer),
-      col = list(" " = query_colors),
-      show_legend = FALSE)
+        query_row_annotation <- ComplexHeatmap::rowAnnotation(
+            " " = rownames(cor_stats_layer),
+            col = list(" " = query_colors),
+            show_legend = FALSE
+        )
+    } else {
+        query_row_annotation <- NULL
+    }
 
-  } else query_row_annotation <- NULL
+    ## reference annotation on bottom
+    if (!is.null(reference_colors)) {
+        stopifnot(all(colnames(cor_stats_layer) %in% names(reference_colors)))
+        reference_colors <- reference_colors[colnames(cor_stats_layer)]
 
-  ## reference annotation on bottom
-  if(!is.null(reference_colors)){
-    stopifnot(all(colnames(cor_stats_layer) %in% names(reference_colors)))
-    reference_colors <- reference_colors[colnames(cor_stats_layer)]
+        ref_col_annotation <- ComplexHeatmap::columnAnnotation(
+            " " = colnames(cor_stats_layer),
+            col = list(" " = reference_colors),
+            show_legend = FALSE
+        )
+    } else {
+        ref_col_annotation <- NULL
+    }
 
-    ref_col_annotation <-  ComplexHeatmap::columnAnnotation(
-      " " = colnames(cor_stats_layer),
-      col = list(" " = reference_colors),
-      show_legend = FALSE
-    )
-  } else ref_col_annotation <- NULL
+    ## add annotation
+    if (!is.null(annotation)) {
+        anno_matrix <- create_annotation_matrix(annotation, cor_stats_layer)
 
-  ## add annotation
-  if(!is.null(annotation)){
-    anno_matrix <- create_annotation_matrix(annotation, cor_stats_layer)
+        ## plot heatmap
+        return(
+            ComplexHeatmap::Heatmap(
+                matrix = cor_stats_layer,
+                col = my.col,
+                name = "Cor",
+                bottom_annotation = ref_col_annotation,
+                right_annotation = query_row_annotation,
+                cell_fun = function(j, i, x, y, width, height, fill) {
+                    grid.text(anno_matrix[i, j], x, y, gp = gpar(fontsize = 10))
+                },
+                ...
+            )
+        )
+    }
 
     ## plot heatmap
     return(
-      ComplexHeatmap::Heatmap(
-        matrix = cor_stats_layer,
-        col = my.col,
-        name = "Cor",
-        bottom_annotation = ref_col_annotation,
-        right_annotation = query_row_annotation,
-        cell_fun = function(j, i, x, y, width, height, fill) {
-          grid.text(anno_matrix[i, j], x, y, gp = gpar(fontsize = 10))
-        },
-        ...
-      ))
-  }
-
-  ## plot heatmap
-  return(
-    ComplexHeatmap::Heatmap(
-      matrix = cor_stats_layer,
-      col = my.col,
-      name = "Cor",
-      bottom_annotation = ref_col_annotation,
-      right_annotation = query_row_annotation,
-      ...
-    ))
-
-
+        ComplexHeatmap::Heatmap(
+            matrix = cor_stats_layer,
+            col = my.col,
+            name = "Cor",
+            bottom_annotation = ref_col_annotation,
+            right_annotation = query_row_annotation,
+            ...
+        )
+    )
 }
 
-create_annotation_matrix <- function(annotation_df, cor_stats_layer){
+create_annotation_matrix <- function(annotation_df, cor_stats_layer) {
+    anno_list <- lapply(
+        rownames(cor_stats_layer),
+        function(cluster) {
+            # look up confidence
+            confidence <- annotation_df[match(cluster, annotation_df$cluster), "layer_confidence"]
+            sym <- ifelse(confidence == "good", "X", "*")
+            # match annotations
+            anno <- annotation_df[match(cluster, annotation_df$cluster), "layer_label"]
+            return(ifelse(unlist(lapply(colnames(cor_stats_layer), grepl, anno)), sym, ""))
+        }
+    )
 
-  anno_list <- lapply(rownames(cor_stats_layer),
-                      function(cluster){
-                        # look up confidence
-                        confidence <- annotation_df[match(cluster, annotation_df$cluster),"layer_confidence"]
-                        sym <- ifelse(confidence=="good", "X","*")
-                        # match annotations
-                        anno <- annotation_df[match(cluster, annotation_df$cluster),"layer_label"]
-                        return(ifelse(unlist(lapply(colnames(cor_stats_layer), grepl, anno)),sym,""))
-                      })
+    anno_matrix <- t(data.frame(anno_list))
+    rownames(anno_matrix) <- rownames(cor_stats_layer)
+    colnames(anno_matrix) <- colnames(cor_stats_layer)
 
-  anno_matrix <- t(data.frame(anno_list))
-  rownames(anno_matrix) <- rownames(cor_stats_layer)
-  colnames(anno_matrix) <- colnames(cor_stats_layer)
-
-  return(anno_matrix)
+    return(anno_matrix)
 }
-
-
-

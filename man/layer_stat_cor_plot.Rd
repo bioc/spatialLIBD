@@ -33,18 +33,25 @@ row annotations.}
 \item{reference_colors}{named \code{character} vector of colors, Adds colors to
 reference column annotations.}
 
-\item{annotation}{annotation data.frame output of \code{\link[=annotate_registered_clusters]{annotate_registered_clusters()}},
-adds 'X' for good confidence annotations, '*' for poor confidence.}
+\item{annotation}{annotation data.frame output of
+\code{\link[=annotate_registered_clusters]{annotate_registered_clusters()}}, adds 'X' for good confidence annotations,
+'*' for poor confidence.}
 
-\item{...}{Additional parameters passed to \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}
-ex. \code{cluster_rows} and \code{cluster_columns}.}
+\item{...}{Additional parameters passed to
+\code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}} such as \code{cluster_rows}
+and \code{cluster_columns}.}
 }
 \value{
-(\link[ComplexHeatmap:Heatmap-class]{Heatmap-class}) plot of t-stat correlations
+(\link[ComplexHeatmap:Heatmap-class]{Heatmap-class}) plot of t-stat
+correlations
 }
 \description{
-Use ComplexHeatmap to plot the correlation matrix between a reference and
-query modeling statistics from \code{\link[=layer_stat_cor]{layer_stat_cor()}}.
+This function makes a ComplexHeatmap from the correlation matrix
+between a reference and query modeling statistics from \code{\link[=layer_stat_cor]{layer_stat_cor()}}.
+For example, between the query statistics from a set of cell cluster/types
+derived from scRNA-seq or snRNA-seq data (among other types) and the
+reference layer statistics from the Human DLPFC Visium data (when using the
+default arguments).
 }
 \details{
 Includes functionality to add color annotations,
@@ -58,52 +65,57 @@ if (!exists("modeling_results")) {
     modeling_results <- fetch_data(type = "modeling_results")
 }
 
-## querey spatailDLPFC modeling 
-query_modeling_results <- fetch_data(type = "spatialDLPFC_Visium_modeling_results")
-
-## extract t-statics and rename
-registration_t_stats <- query_modeling_results$enrichment[, grep("^t_stat", colnames(query_modeling_results$enrichment))]
-colnames(registration_t_stats) <- gsub("^t_stat_", "", colnames(registration_t_stats))
+## query spatialDLPFC modeling results
+query_modeling_results <- fetch_data(
+    type = "spatialDLPFC_Visium_modeling_results"
+)
 
 ## Compute the correlations
 cor_stats_layer <- layer_stat_cor(
-    stats = registration_t_stats,
+    stats = query_modeling_results$enrichment,
     modeling_results,
     model_type = "enrichment"
 )
 
 ## Visualize the correlation matrix
 
-## most basic
+## Default plot with no annotations and defaults for ComplexHeatmap()
 layer_stat_cor_plot(cor_stats_layer)
 
 ## add colors
-## add libd_layer_colors to refrence Human Pilot layers
+## add libd_layer_colors to reference Human Pilot layers
 layer_stat_cor_plot(cor_stats_layer, reference_colors = libd_layer_colors)
 
-## supply polychrome colors to query clusters
-cluster_colors <-  c('#5A5156', '#E4E1E3', '#F6222E', '#FE00FA', '#16FF32', '#3283FE', '#FEAF16', '#B00068', '#1CFFCE')
-names(cluster_colors) <- rownames(cor_stats_layer)
-
-layer_stat_cor_plot(cor_stats_layer, 
-                            query_colors = cluster_colors,
-                            reference_colors = libd_layer_colors)
+## obtain colors for the query clusters
+cluster_colors <- get_colors(clusters = rownames(cor_stats_layer))
+layer_stat_cor_plot(cor_stats_layer,
+    query_colors = cluster_colors,
+    reference_colors = libd_layer_colors
+)
 
 ## Apply additional ComplexHeatmap param
-layer_stat_cor_plot(cor_stats_layer, cluster_rows = FALSE, cluster_columns = FALSE)
+layer_stat_cor_plot(cor_stats_layer,
+    cluster_rows = FALSE,
+    cluster_columns = FALSE
+)
 
 ## Add annotation
-annotation_df <- annotate_registered_clusters(cor_stats_layer, confidence_threshold = .55)
+annotation_df <- annotate_registered_clusters(
+    cor_stats_layer,
+    confidence_threshold = .55
+)
 layer_stat_cor_plot(cor_stats_layer, annotation = annotation_df)
 
 ## All together
-layer_stat_cor_plot(cor_stats_layer, 
-                            query_colors = cluster_colors,
-                            reference_colors = libd_layer_colors, 
-                            annotation = annotation_df, 
-                            cluster_rows = FALSE, 
-                            cluster_columns = FALSE)
-                            
+layer_stat_cor_plot(
+    cor_stats_layer,
+    query_colors = cluster_colors,
+    reference_colors = libd_layer_colors,
+    annotation = annotation_df,
+    cluster_rows = FALSE,
+    cluster_columns = FALSE
+)
+
 }
 \seealso{
 Other Layer correlation functions: 

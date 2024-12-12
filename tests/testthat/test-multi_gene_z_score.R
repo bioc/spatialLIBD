@@ -21,12 +21,14 @@ test_that(
         #   columns were dropped
         cont_mat <- matrix(c(1, NA, 3, 4, 2, 2), ncol = 3)
         colnames(cont_mat) <- c("bad1", "good", "bad2")
-        
-        temp = c(3, 4)
-        expected_result = (temp - mean(temp)) / sd(temp)
+
+        temp <- c(3, 4)
+        expected_result <- (temp - mean(temp)) / sd(temp)
 
         expect_warning(
-            { actual_result = multi_gene_z_score(cont_mat) },
+            {
+                actual_result <- multi_gene_z_score(cont_mat)
+            },
             "Dropping features\\(s\\) 'bad1', 'bad2' which have no expression variation"
         )
         expect_equal(actual_result, expected_result)

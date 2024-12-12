@@ -46,7 +46,8 @@ layer-level (group-level) resolution. See \code{\link[=fetch_data]{fetch_data()}
 columns \verb{f_stat_*} or \verb{t_stat_*} as well as \verb{p_value_*} and \verb{fdr_*} plus
 \code{ensembl}. The column name is used to extract the statistic results, the
 p-values, and the FDR adjusted p-values. Then the \code{ensembl} column is used
-for matching in some cases. See \code{\link[=fetch_data]{fetch_data()}} for more details.}
+for matching in some cases. See \code{\link[=fetch_data]{fetch_data()}} for more details. Typically
+this is the set of reference statistics used in \code{layer_stat_cor()}.}
 
 \item{sig_genes}{The output of \code{\link[=sig_genes_extract_all]{sig_genes_extract_all()}} which is a table
 in long format with the modeling results. You can subset this if the object
