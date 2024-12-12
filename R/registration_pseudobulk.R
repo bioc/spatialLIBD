@@ -8,7 +8,9 @@
 #' object or one that inherits its properties.
 #' @param var_registration A `character(1)` specifying the `colData(sce)`
 #' variable of interest against which will be used for computing the relevant
-#' statistics.
+#' statistics. This should be a categorical variable, with all categories 
+#' syntaticly valid (could be used as an R variable, no special characters or 
+#' leading numbers), ex. 'L1.2', 'celltype2' not 'L1/2' or '2'.
 #' @param var_sample_id A `character(1)` specifying the `colData(sce)` variable
 #' with the sample ID.
 #' @param covars A `character()` with names of sample-level covariates.
