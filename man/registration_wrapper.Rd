@@ -23,7 +23,9 @@ object or one that inherits its properties.}
 
 \item{var_registration}{A \code{character(1)} specifying the \code{colData(sce)}
 variable of interest against which will be used for computing the relevant
-statistics.}
+statistics. This should be a categorical variable, with all categories
+syntaticly valid (could be used as an R variable, no special characters or
+leading numbers), ex. 'L1.2', 'celltype2' not 'L1/2' or '2'.}
 
 \item{var_sample_id}{A \code{character(1)} specifying the \code{colData(sce)} variable
 with the sample ID.}
