@@ -283,7 +283,7 @@ We can see from this heatmap what layers the different cell types are associated
 
 
 ```{r layer_cor_plot}
-layer_stat_cor_plot(cor_layer, max = max(cor_layer))
+layer_stat_cor_plot(cor_layer)
 ```
 
 ## Annotate Cell Types by Top Correlation
