@@ -1,3 +1,22 @@
+# spatialLIBD 1.19.1
+
+NEW FEATURES
+
+* Merged <https://github.com/LieberInstitute/spatialLIBD/pull/91> by @lahuuki.
+This pull request fully re-implemented `layer_stat_cor_plot()` with a version
+that uses `ComplexHeatmap::Heatmap()` internally. It also adds support for
+incorporating the automatic annotation results from
+`annotate_registered_clusters()`. NOTE that the `max` argument was renamed to
+`color_max`, as well as `min` to `color_min`. Also, the default for `min` used
+to be `-max` and now for `color_min` the default is the `min()` correlation
+observed. The default for `max` was 0.81 and the default for `color_max()` is
+the `max()` observed correlation.
+* `run_app()` was also updated to match the updated in `layer_stat_cor_plot()`
+and now has 2 new inputs for controlling the annotation process with
+`annotate_registered_clusters()`. It also allows downloading a CSV file with
+the annotation results.
+
+
 # spatialLIBD 1.17.10
 
 BUG FIXES
