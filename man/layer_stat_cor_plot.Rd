@@ -8,7 +8,7 @@ layer_stat_cor_plot(
   cor_stats_layer,
   color_max = max(cor_stats_layer),
   color_min = min(cor_stats_layer),
-  color_scale = RColorBrewer::brewer.pal(7, "PRGn"),
+  color_scale = c("#762A83", "#F7F7F7", "#1B7837"),
   query_colors = NULL,
   reference_colors = NULL,
   annotation = NULL,
@@ -24,8 +24,9 @@ the color scale (should be between 0 and 1).}
 \item{color_min}{A \code{numeric(1)} specifying the lowest correlation value for
 the color scale (should be between 0 and -1).}
 
-\item{color_scale}{A \code{character} vector specifying the color scale for the
-fill of the heatmap, defaults to classic purple -> green.}
+\item{color_scale}{A \code{character(3)} vector specifying the color scale for the
+fill of the heatmap. The first value is used for \code{color_min}, the second one
+for zero, and the third for \code{color_max}.}
 
 \item{query_colors}{named \code{character} vector of colors, Adds colors to query
 row annotations.}

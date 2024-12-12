@@ -55,7 +55,6 @@ Imports:
     scater,
     DT,
     ExperimentHub,
-    RColorBrewer,
     SummarizedExperiment,
     stats,
     graphics,
@@ -80,7 +79,8 @@ Imports:
     MatrixGenerics,
     rlang,
     dplyr,
-    ComplexHeatmap
+    ComplexHeatmap,
+    circlize
 RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 URL: https://github.com/LieberInstitute/spatialLIBD
@@ -95,7 +95,8 @@ Suggests:
     here,
     BiocManager,
     lobstr,
-    DropletUtils
+    DropletUtils,
+    RColorBrewer
 VignetteBuilder: knitr
 biocViews: Homo_sapiens_Data, ExperimentHub, SequencingData, SingleCellData,
     ExpressionData, Tissue, PackageTypeData, SpatialData

@@ -856,7 +856,25 @@ app_ui <- function() {
                                             max = 1,
                                             step = 0.01
                                         ),
-                                        helpText("Use a smaller positive number to change the range of the color scale used. Use 1 if you want the color range to reflect the maximum range of correlation values. Default: 0.81.")
+                                        helpText("Use a smaller positive number to change the range of the color scale used. Use 1 if you want the color range to reflect the maximum range of correlation values. Default: 0.81."),
+                                        numericInput(
+                                            "layer_confidence_threshold",
+                                            label = "Annotation confidence threshold",
+                                            value = 0.25,
+                                            min = 0,
+                                            max = 1,
+                                            step = 0.01
+                                        ),
+                                        helpText("Minimum correlation for a high confidence annotation. Higher values are more strict in annotating. Default: 0.25."),
+                                        numericInput(
+                                            "layer_cutoff_merge_ratio",
+                                            label = "Annotation cutoff merge ratio",
+                                            value = 0.25,
+                                            min = 0,
+                                            max = 1,
+                                            step = 0.01
+                                        ),
+                                        helpText("Ratio the next closest correlation and the current one. Lower values are more strict in annotating. Default: 0.25.")
                                     )
                                 ),
                                 hr(),

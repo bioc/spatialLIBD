@@ -1471,7 +1471,15 @@ app_server <- function(input, output, session) {
     static_layer_external_tstat_plot <- reactive({
         layer_stat_cor_plot(
             static_layer_external_tstat(),
-            max(c(0.1, input$layer_tstat_max))
+            max(c(0.1, input$layer_tstat_max)),
+            -max(c(0.1, input$layer_tstat_max)),
+            cluster_rows = FALSE,
+            cluster_columns = FALSE,
+            annotation = annotate_registered_clusters(
+                static_layer_external_tstat(),
+                input$layer_confidence_threshold,
+                input$layer_cutoff_merge_ratio
+            )
         )
     })
 
@@ -1639,10 +1647,19 @@ app_server <- function(input, output, session) {
                 height = 8,
                 width = 12
             )
-            layer_stat_cor_plot(
+            p <- layer_stat_cor_plot(
                 static_layer_external_tstat(),
-                max(c(0.1, input$layer_tstat_max))
+                max(c(0.1, input$layer_tstat_max)),
+                -max(c(0.1, input$layer_tstat_max)),
+                cluster_rows = FALSE,
+                cluster_columns = FALSE,
+                annotation = annotate_registered_clusters(
+                    static_layer_external_tstat(),
+                    input$layer_confidence_threshold,
+                    input$layer_cutoff_merge_ratio
+                )
             )
+            print(p)
             dev.off()
         }
     )

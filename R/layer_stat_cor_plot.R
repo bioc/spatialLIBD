@@ -16,8 +16,9 @@
 #' the color scale (should be between 0 and 1).
 #' @param color_min A `numeric(1)` specifying the lowest correlation value for
 #' the color scale (should be between 0 and -1).
-#' @param color_scale A `character` vector specifying the color scale for the
-#' fill of the heatmap, defaults to classic purple -> green.
+#' @param color_scale A `character(3)` vector specifying the color scale for the
+#' fill of the heatmap. The first value is used for `color_min`, the second one
+#' for zero, and the third for `color_max`.
 #' @param query_colors named `character` vector of colors, Adds colors to query
 #' row annotations.
 #' @param reference_colors named `character` vector of colors, Adds colors to
@@ -36,8 +37,7 @@
 #' @author Louise Huuki-Myers
 #' @family Layer correlation functions
 #'
-#' @importFrom RColorBrewer brewer.pal
-#' @importFrom grDevices colorRampPalette
+#' @importFrom circlize colorRamp2
 #' @importFrom ComplexHeatmap columnAnnotation rowAnnotation Heatmap
 #'
 #' @examples
@@ -101,14 +101,16 @@
 layer_stat_cor_plot <- function(cor_stats_layer,
     color_max = max(cor_stats_layer),
     color_min = min(cor_stats_layer),
-    color_scale = RColorBrewer::brewer.pal(7, "PRGn"),
+    color_scale = c("#762A83", "#F7F7F7", "#1B7837"),
     query_colors = NULL,
     reference_colors = NULL,
     annotation = NULL,
     ...) {
     ## define color pallet
-    theSeq <- seq(color_min, color_max, by = 0.01)
-    my.col <- grDevices::colorRampPalette(color_scale)(length(theSeq))
+    stopifnot(color_min < color_max)
+    stopifnot(color_min < 0)
+    stopifnot(length(color_scale) == 3)
+    my.col <- circlize::colorRamp2(c(color_min, 0, color_max), color_scale)
 
     # ## query annotations on row
     if (!is.null(query_colors)) {
