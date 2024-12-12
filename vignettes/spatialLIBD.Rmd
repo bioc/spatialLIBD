@@ -49,6 +49,7 @@ bib <- c(
     BiocFileCache = citation("BiocFileCache")[1],
     BiocGenerics = citation("BiocGenerics")[1],
     BiocStyle = citation("BiocStyle")[1],
+    ComplexHeatmap = citation("ComplexHeatmap")[1],
     cowplot = citation("cowplot")[1],
     DT = citation("DT")[1],
     edgeR = citation("edgeR")[1],
@@ -615,6 +616,7 @@ The `r Biocpkg('spatialLIBD')` package `r Citep(bib[['spatialLIBD']])` was made 
 * `r Biocpkg('BiocFileCache')` `r Citep(bib[['BiocFileCache']])`
 * `r Biocpkg('BiocGenerics')` `r Citep(bib[['BiocGenerics']])`
 * `r Biocpkg('BiocStyle')` `r Citep(bib[['BiocStyle']])`
+* `r Biocpkg('ComplexHeatmap')` `r Citep(bib[['ComplexHeatmap']])`
 * `r CRANpkg('cowplot')` `r Citep(bib[['cowplot']])`
 * `r CRANpkg('DT')` `r Citep(bib[['DT']])`
 * `r Biocpkg('edgeR')` `r Citep(bib[['edgeR']])`
