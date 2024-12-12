@@ -1,3 +1,11 @@
+# spatialLIBD 1.19.3
+
+BUG FIXES
+
+* Resolved <https://github.com/LieberInstitute/spatialLIBD/issues/90> which made
+`add_key()` too strict and would create issues with `export_cluster()`. Reported
+by @lahuuki and @manishabarse.
+
 # spatialLIBD 1.19.2
 
 BUG FIXES
@@ -5,7 +13,8 @@ BUG FIXES
 * Merged <https://github.com/LieberInstitute/spatialLIBD/pull/92> by @lahuuki.
 This fixes https://github.com/LieberInstitute/spatialLIBD/issues/72 and
 https://github.com/LieberInstitute/spatialLIBD/issues/48 by making 
-`registration_pseudobulk()` more robust.
+`registration_pseudobulk()` more robust. The original issues were reported by
+@boyiguo1 and @berniejmulvey.
 
 # spatialLIBD 1.19.1
 
