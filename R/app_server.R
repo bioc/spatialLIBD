@@ -1488,6 +1488,7 @@ app_server <- function(input, output, session) {
                 clusters = rownames(static_layer_external_tstat())
             ),
             reference_colors = get_colors(
+                libd_layer_colors,
                 clusters = colnames(static_layer_external_tstat())
             )
         )
