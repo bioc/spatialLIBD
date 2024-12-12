@@ -42,14 +42,17 @@ add_key <- function(spe, overwrite = TRUE) {
             message(
                 "Overwriting 'spe$key'. Set 'overwrite = FALSE' if you do not want to overwrite it."
             )
-        } else {
-            stop(
-                "'spe$key' already exists. Set 'overwrite = TRUE' if you want to replace it.",
+            spe$key <- paste0(colnames(spe), "_", spe$sample_id)
+            stopifnot(!any(duplicated(spe$key)))
+        } else if (any(duplicated(spe$key))) {
+            warning(
+                "'spe$key' already exists and is not unique. Set 'overwrite = TRUE' to replace 'spe$key' with unique values.",
                 call. = FALSE
             )
         }
+    } else {
+        spe$key <- paste0(colnames(spe), "_", spe$sample_id)
+        stopifnot(!any(duplicated(spe$key)))
     }
-    spe$key <- paste0(colnames(spe), "_", spe$sample_id)
-    stopifnot(!any(duplicated(spe$key)))
     return(spe)
 }
