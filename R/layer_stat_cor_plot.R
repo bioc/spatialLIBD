@@ -68,20 +68,8 @@
 #' ## add libd_layer_colors to reference Human Pilot layers
 #' layer_stat_cor_plot(cor_stats_layer, reference_colors = libd_layer_colors)
 #'
-#' ## supply polychrome colors to query clusters
-#' cluster_colors <-  c(
-#'     '#5A5156',
-#'     '#E4E1E3',
-#'     '#F6222E',
-#'     '#FE00FA',
-#'     '#16FF32',
-#'     '#3283FE',
-#'     '#FEAF16',
-#'     '#B00068',
-#'     '#1CFFCE'
-#' )
-#' names(cluster_colors) <- rownames(cor_stats_layer)
-#'
+#' ## obtain colors for the query clusters
+#' cluster_colors <- get_colors(clusters = rownames(cor_stats_layer))
 #' layer_stat_cor_plot(cor_stats_layer,
 #'     query_colors = cluster_colors,
 #'     reference_colors = libd_layer_colors)
