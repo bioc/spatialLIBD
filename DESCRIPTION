@@ -60,7 +60,6 @@ Imports:
     graphics,
     S4Vectors,
     IRanges,
-    fields,
     benchmarkme,
     SingleCellExperiment,
     BiocFileCache,
