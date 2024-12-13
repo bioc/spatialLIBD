@@ -129,6 +129,7 @@
 #'     plot_SetSize_bar = TRUE,
 #'     model_sig_length = n_sig_model
 #' )
+#' layer_gene_count <- get_gene_enrichment_count(model_results = modeling_results)
 #'
 #'## add color annotaions
 #' gene_set_enrichment_plot(
