@@ -47,7 +47,7 @@ bib <- c(
     R = citation(),
     BiocStyle = citation("BiocStyle")[1],
     knitr = citation("knitr")[3],
-	MatrixGenerics = citation("MatrixGenerics")[1],
+    MatrixGenerics = citation("MatrixGenerics")[1],
     RColorBrewer = citation("RColorBrewer")[1],
     RefManageR = citation("RefManageR")[1],
     rmarkdown = citation("rmarkdown")[1],

@@ -92,7 +92,7 @@
 #' gene_set_enrichment_plot(
 #'     asd_sfari_enrichment,
 #'     xlabs = gsub(".*_", "", unique(asd_sfari_enrichment$ID)),
-#'     mypal = c("white",RColorBrewer::brewer.pal(9, "BuGn"))
+#'     mypal = c("white", RColorBrewer::brewer.pal(9, "BuGn"))
 #' )
 #'
 #' ## Add bar plot annotations for SetSize of model genes in the gene_lists
@@ -120,7 +120,7 @@
 #'     n = nrow(sce_layer)
 #' )
 #'
-#' sig_genes <- sig_genes[sig_genes$fdr < 0.1,]
+#' sig_genes <- sig_genes[sig_genes$fdr < 0.1, ]
 #' n_sig_model <- as.list(table(sig_genes$test))
 #'
 #' ## add barplot with n significant genes from modeling
@@ -149,160 +149,161 @@
 #' )
 #'
 gene_set_enrichment_plot <-
-  function(
-    enrichment,
-    xlabs = unique(enrichment$ID),
-    PThresh = 12,
-    ORcut = 3,
-    enrichOnly = FALSE,
-    mypal = c("white", RColorBrewer::brewer.pal(9, "YlOrRd")),
-    plot_SetSize_bar = FALSE,
-    gene_list_length = NULL,
-    model_sig_length = NULL,
-    model_colors = NULL,
-    ...
-  ){
-    ## Re-order and shorten names if they match our data
-    if (all(unique(enrichment$test) %in% c("WM", paste0("Layer", seq_len(6))))) {
-      enrichment$test <-
-        factor(gsub("ayer", "", enrichment$test), levels = rev(c(paste0(
-          "L", seq_len(6)
-        ), "WM")))
-    }
+    function(
+        enrichment,
+        xlabs = unique(enrichment$ID),
+        PThresh = 12,
+        ORcut = 3,
+        enrichOnly = FALSE,
+        mypal = c("white", RColorBrewer::brewer.pal(9, "YlOrRd")),
+        plot_SetSize_bar = FALSE,
+        gene_list_length = NULL,
+        model_sig_length = NULL,
+        model_colors = NULL,
+        ...) {
+        ## Re-order and shorten names if they match our data
+        if (all(unique(enrichment$test) %in% c("WM", paste0("Layer", seq_len(6))))) {
+            enrichment$test <-
+                factor(gsub("ayer", "", enrichment$test), levels = rev(c(paste0(
+                    "L", seq_len(6)
+                ), "WM")))
+        }
 
-    ## Check inputs
-    stopifnot(is(enrichment, "data.frame"))
-    stopifnot(all(c("ID", "test", "OR", "Pval") %in% colnames(enrichment)))
-    stopifnot(ORcut <= PThresh)
-    stopifnot(length(xlabs) == length(unique(enrichment$ID)))
+        ## Check inputs
+        stopifnot(is(enrichment, "data.frame"))
+        stopifnot(all(c("ID", "test", "OR", "Pval") %in% colnames(enrichment)))
+        stopifnot(ORcut <= PThresh)
+        stopifnot(length(xlabs) == length(unique(enrichment$ID)))
 
-    ## Convert to -log10 scale and threshold the pvalues
-    enrichment$log10_P_thresh <-
-      round(-log10(enrichment$Pval), 2)
-    enrichment$log10_P_thresh[which(enrichment$log10_P_thresh > PThresh)] <-
-      PThresh
+        ## Convert to -log10 scale and threshold the pvalues
+        enrichment$log10_P_thresh <-
+            round(-log10(enrichment$Pval), 2)
+        enrichment$log10_P_thresh[which(enrichment$log10_P_thresh > PThresh)] <-
+            PThresh
 
-    ## Change some values for the plot
-    if (enrichOnly) {
-      enrichment$log10_P_thresh[enrichment$OR < 1] <- 0
-    }
-    enrichment$OR_char <- as.character(round(enrichment$OR, 2))
-    enrichment$OR_char[enrichment$log10_P_thresh < ORcut] <- ""
+        ## Change some values for the plot
+        if (enrichOnly) {
+            enrichment$log10_P_thresh[enrichment$OR < 1] <- 0
+        }
+        enrichment$OR_char <- as.character(round(enrichment$OR, 2))
+        enrichment$OR_char[enrichment$log10_P_thresh < ORcut] <- ""
 
-    ## sub xlabs labels
-    if(!is.null(gene_list_length)){
-      stopifnot(setequal(names(gene_list_length), unique(enrichment$ID)))
-      gene_list_length <- gene_list_length[unique(enrichment$ID)]
-      names(gene_list_length) <- xlabs
-    }
+        ## sub xlabs labels
+        if (!is.null(gene_list_length)) {
+            stopifnot(setequal(names(gene_list_length), unique(enrichment$ID)))
+            gene_list_length <- gene_list_length[unique(enrichment$ID)]
+            names(gene_list_length) <- xlabs
+        }
 
-    for(i in seq(length(xlabs))){
-      enrichment$ID <- gsub(unique(enrichment$ID)[[i]], xlabs[[i]], enrichment$ID)
-    }
+        for (i in seq(length(xlabs))) {
+            enrichment$ID <- gsub(unique(enrichment$ID)[[i]], xlabs[[i]], enrichment$ID)
+        }
 
-    ## Make into wide matrices
-    make_wide <- function(var = "OR_char") {
-      res <-
-        reshape(
-          enrichment,
-          idvar = "ID",
-          timevar = "test",
-          direction = "wide",
-          drop = colnames(enrichment)[!colnames(enrichment) %in% c("ID", "test", var)],
-          sep = "_mypattern_"
-        )[, -1, drop = FALSE]
-      colnames(res) <-
-        gsub(".*_mypattern_", "", colnames(res))
-      rownames(res) <- unique(enrichment$ID)
-      res <- res[, levels(as.factor(enrichment$test))]
-      t(res)
-    }
-    wide_or <- make_wide("OR_char")
-    wide_p <- make_wide("log10_P_thresh")
+        ## Make into wide matrices
+        make_wide <- function(var = "OR_char") {
+            res <-
+                reshape(
+                    enrichment,
+                    idvar = "ID",
+                    timevar = "test",
+                    direction = "wide",
+                    drop = colnames(enrichment)[!colnames(enrichment) %in% c("ID", "test", var)],
+                    sep = "_mypattern_"
+                )[, -1, drop = FALSE]
+            colnames(res) <-
+                gsub(".*_mypattern_", "", colnames(res))
+            rownames(res) <- unique(enrichment$ID)
+            res <- res[, levels(as.factor(enrichment$test))]
+            t(res)
+        }
+        wide_or <- make_wide("OR_char")
+        wide_p <- make_wide("log10_P_thresh")
 
-    ## define color pallet
-    mypal = circlize::colorRamp2(breaks = seq(0, max(wide_p), length.out = length(mypal)),
-                                 colors = mypal)
-
-    ## Add gene count annotations
-    enrichment_setsize <- unique(enrichment[,c("ID", "SetSize")])
-
-    ## COL annotations
-    if(plot_SetSize_bar){
-
-      if(!is.null(gene_list_length)){
-        stopifnot(all(colnames(wide_p) %in% names(gene_list_length)))
-        enrichment_setsize$SetInput <- unlist(gene_list_length[enrichment_setsize$ID])
-        enrichment_setsize$Diff <- enrichment_setsize$SetInput - enrichment_setsize$SetSize
-      }
-
-      rownames(enrichment_setsize) <- enrichment_setsize$ID
-      enrichment_setsize$ID <- NULL
-      enrichment_setsize$SetInput <- NULL ## only plot SetSize + Diff
-
-      col_gene_anno <- ComplexHeatmap::columnAnnotation(
-        `SetSize` = ComplexHeatmap::anno_barplot(enrichment_setsize)
-      )
-
-    } else col_gene_anno <- NULL
-
-    if(!is.null(model_colors)){
-      ## shorten names if they match HumanPilot data
-      if (all(c("WM", paste0("Layer", seq_len(6))) %in% names(model_colors))) {
-        names(model_colors) <-gsub("ayer", "", names(model_colors))
-      }}
-
-
-    ## ROW annotations
-    if(!is.null(model_sig_length)){ ## add row barplot annotation
-
-      ## shorten names if they match HumanPilot data
-      if (all(names(model_sig_length) %in% c("WM", paste0("Layer", seq_len(6))))) {
-        names(model_sig_length) <-gsub("ayer", "", names(model_sig_length))
-      }
-
-      stopifnot(all(rownames(wide_p) %in% names(model_sig_length)))
-      model_sig_length <- t(data.frame(model_sig_length))
-
-      if(!is.null(model_colors)){ ## barplot with colors
-        row_gene_anno <- ComplexHeatmap::rowAnnotation(
-          `n\nmodel sig` = ComplexHeatmap::anno_barplot(model_sig_length[rownames(wide_p), ],
-                                                        gp = gpar(fill = model_colors[rownames(wide_p)])
-          )
-          # annotation_label = anno_title_row
-
+        ## define color pallet
+        mypal <- circlize::colorRamp2(
+            breaks = seq(0, max(wide_p), length.out = length(mypal)),
+            colors = mypal
         )
-      } else { ## barplot no colors
-        row_gene_anno <- ComplexHeatmap::rowAnnotation(
-          `model sig` = ComplexHeatmap::anno_barplot(model_sig_length[rownames(wide_p), ])
-          # annotation_label = anno_title_row
+
+        ## Add gene count annotations
+        enrichment_setsize <- unique(enrichment[, c("ID", "SetSize")])
+
+        ## COL annotations
+        if (plot_SetSize_bar) {
+            if (!is.null(gene_list_length)) {
+                stopifnot(all(colnames(wide_p) %in% names(gene_list_length)))
+                enrichment_setsize$SetInput <- unlist(gene_list_length[enrichment_setsize$ID])
+                enrichment_setsize$Diff <- enrichment_setsize$SetInput - enrichment_setsize$SetSize
+            }
+
+            rownames(enrichment_setsize) <- enrichment_setsize$ID
+            enrichment_setsize$ID <- NULL
+            enrichment_setsize$SetInput <- NULL ## only plot SetSize + Diff
+
+            col_gene_anno <- ComplexHeatmap::columnAnnotation(
+                `SetSize` = ComplexHeatmap::anno_barplot(enrichment_setsize)
+            )
+        } else {
+            col_gene_anno <- NULL
+        }
+
+        if (!is.null(model_colors)) {
+            ## shorten names if they match HumanPilot data
+            if (all(c("WM", paste0("Layer", seq_len(6))) %in% names(model_colors))) {
+                names(model_colors) <- gsub("ayer", "", names(model_colors))
+            }
+        }
+
+
+        ## ROW annotations
+        if (!is.null(model_sig_length)) { ## add row barplot annotation
+
+            ## shorten names if they match HumanPilot data
+            if (all(names(model_sig_length) %in% c("WM", paste0("Layer", seq_len(6))))) {
+                names(model_sig_length) <- gsub("ayer", "", names(model_sig_length))
+            }
+
+            stopifnot(all(rownames(wide_p) %in% names(model_sig_length)))
+            model_sig_length <- t(data.frame(model_sig_length))
+
+            if (!is.null(model_colors)) { ## barplot with colors
+                row_gene_anno <- ComplexHeatmap::rowAnnotation(
+                    `n\nmodel sig` = ComplexHeatmap::anno_barplot(model_sig_length[rownames(wide_p), ],
+                        gp = gpar(fill = model_colors[rownames(wide_p)])
+                    )
+                    # annotation_label = anno_title_row
+                )
+            } else { ## barplot no colors
+                row_gene_anno <- ComplexHeatmap::rowAnnotation(
+                    `model sig` = ComplexHeatmap::anno_barplot(model_sig_length[rownames(wide_p), ])
+                    # annotation_label = anno_title_row
+                )
+            }
+        } else if (!is.null(model_colors)) { ## only apply color annotation
+
+            stopifnot(all(rownames(wide_p) %in% names(model_colors)))
+            model_colors <- model_colors[rownames(wide_p)]
+
+            row_gene_anno <- ComplexHeatmap::rowAnnotation(
+                " " = rownames(wide_p),
+                col = list(" " = model_colors),
+                show_legend = FALSE
+            )
+        } else {
+            row_gene_anno <- NULL
+        }
+
+        ComplexHeatmap::Heatmap(wide_p,
+            col = mypal,
+            name = "-log10(p-val)",
+            rect_gp = grid::gpar(col = "black", lwd = 1),
+            cluster_rows = FALSE,
+            cluster_columns = FALSE,
+            right_annotation = row_gene_anno,
+            top_annotation = col_gene_anno,
+            cell_fun = function(j, i, x, y, width, height, fill) {
+                grid::grid.text(wide_or[i, j], x, y, gp = grid::gpar(fontsize = 10))
+            },
+            ...
         )
-      }
-
-    } else if(!is.null(model_colors)){ ## only apply color annotation
-
-      stopifnot(all(rownames(wide_p) %in% names(model_colors)))
-      model_colors <- model_colors[rownames(wide_p)]
-
-      row_gene_anno <- ComplexHeatmap::rowAnnotation(
-        " " = rownames(wide_p),
-        col = list(" " = model_colors),
-        show_legend = FALSE
-      )
-
-    }else row_gene_anno <- NULL
-
-    ComplexHeatmap::Heatmap(wide_p,
-                            col = mypal,
-                            name = "-log10(p-val)",
-                            rect_gp = grid::gpar(col = "black", lwd = 1),
-                            cluster_rows = FALSE,
-                            cluster_columns = FALSE,
-                            right_annotation = row_gene_anno,
-                            top_annotation = col_gene_anno,
-                            cell_fun = function(j, i, x, y, width, height, fill) {
-                              grid::grid.text(wide_or[i, j], x, y, gp = grid::gpar(fontsize = 10))
-                            },
-                            ...
-    )
-  }
+    }

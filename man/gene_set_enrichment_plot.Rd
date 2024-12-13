@@ -42,13 +42,13 @@ white, yellow, red pallet.}
 from \code{enrichment} as an \code{anno_barplot} at the top of the heatmap.}
 
 \item{gene_list_length}{Optional named \code{numeric} vector indicating the length
-of the \code{gene_list} used to calculate \code{enrichment}, if inclided and
+of the \code{gene_list} used to calculate \code{enrichment}, if included and
 \code{plot_setSize_bar = TRUE} then the top \code{anno_barplot} will show the \code{SetSize}
 and the difference from the length of the input gene_list.
 #' @param model_sig_length Optional named \code{numeric} vector indicating the
 number of significant genes in \code{modeling_results} used to calculate
 \code{enrichment}. If included \code{anno_barplot} will be added to rows.
-#' @param model_colors named \code{character} vector of colors, Adds colors to
+#' @param model_colors named \code{character} vector of colors. It adds colors to
 row annotations.
 #' @param ... Additional parameters passed to
 \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}.}
@@ -114,7 +114,7 @@ gene_set_enrichment_plot(
 gene_set_enrichment_plot(
     asd_sfari_enrichment,
     xlabs = gsub(".*_", "", unique(asd_sfari_enrichment$ID)),
-    mypal = c("white",RColorBrewer::brewer.pal(9, "BuGn"))
+    mypal = c("white", RColorBrewer::brewer.pal(9, "BuGn"))
 )
 
 ## Add bar plot annotations for SetSize of model genes in the gene_lists
@@ -142,7 +142,7 @@ sig_genes <- sig_genes_extract(
     n = nrow(sce_layer)
 )
 
-sig_genes <- sig_genes[sig_genes$fdr < 0.1,]
+sig_genes <- sig_genes[sig_genes$fdr < 0.1, ]
 n_sig_model <- as.list(table(sig_genes$test))
 
 ## add barplot with n significant genes from modeling

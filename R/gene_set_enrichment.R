@@ -19,7 +19,7 @@
 #' * `Pval` p-value for `fisher.test()`.
 #' * `test` group or layer in the `modeling_results`.
 #' * `NumSig` Number of genes from the gene set present in `modeling_results` &
-#'  with `fdr < fdr_cut` and `t_stat > 0` (unless reverse = TRUE) for `test` in 
+#'  with `fdr < fdr_cut` and `t_stat > 0` (unless reverse = TRUE) for `test` in
 #'  modeling results.
 #' * `SetSize` Number of genes from `modeling_results` present in `gene_set`.
 #' * `ID` name of gene set.
