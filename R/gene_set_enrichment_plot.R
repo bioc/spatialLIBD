@@ -24,13 +24,13 @@
 #' @param plot_SetSize_bar A `logical(1)` indicating whether to plot SetSize
 #' from `enrichment` as an `anno_barplot` at the top of the heatmap.
 #' @param gene_list_length Optional named `numeric` vector indicating the length
-#' of the `gene_list` used to calculate `enrichment`, if inclided and
+#' of the `gene_list` used to calculate `enrichment`, if included and
 #' `plot_setSize_bar = TRUE` then the top `anno_barplot` will show the `SetSize`
 #'  and the difference from the length of the input gene_list.
 #' #' @param model_sig_length Optional named `numeric` vector indicating the
 #' number of significant genes in `modeling_results` used to calculate
 #' `enrichment`. If included `anno_barplot` will be added to rows.
-#' #' @param model_colors named `character` vector of colors, Adds colors to
+#' #' @param model_colors named `character` vector of colors. It adds colors to
 #' row annotations.
 #' #' @param ... Additional parameters passed to
 #' [ComplexHeatmap::Heatmap()][ComplexHeatmap::Heatmap()].

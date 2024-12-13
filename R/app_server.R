@@ -1443,7 +1443,15 @@ app_server <- function(input, output, session) {
     })
 
     static_layer_gene_set_enrichment_plot <- reactive({
-        gene_set_enrichment_plot(static_layer_gene_set_enrichment())
+        enriched <- static_layer_gene_set_enrichment()
+        gene_set_enrichment_plot(
+            enriched,
+            plot_SetSize_bar = TRUE,
+            model_colors = get_colors(
+                spatialLIBD::libd_layer_colors,
+                clusters = unique(enriched$test)
+            )
+        )
     })
 
 
@@ -1632,7 +1640,8 @@ app_server <- function(input, output, session) {
                 height = 8,
                 width = 8
             )
-            gene_set_enrichment_plot(static_layer_gene_set_enrichment())
+            p <- static_layer_gene_set_enrichment_plot()
+            print(p)
             dev.off()
         }
     )
