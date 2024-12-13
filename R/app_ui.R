@@ -14,6 +14,7 @@ app_ui <- function() {
     sce_layer <- golem::get_golem_options("sce_layer")
     modeling_results <- golem::get_golem_options("modeling_results")
     sig_genes <- golem::get_golem_options("sig_genes")
+    auto_crop_default <- golem::get_golem_options("auto_crop_default")
 
     red_dim_names <- reducedDimNames(spe)
     if (length(red_dim_names) > 0) {
@@ -104,14 +105,27 @@ app_ui <- function() {
                         hr(),
                         pickerInput(
                             inputId = "geneid",
-                            label = "Continuous variable to plot",
+                            label = "Continuous variable(s) to plot",
                             choices = c(
                                 golem::get_golem_options("spe_continuous_vars"),
                                 sort(rowData(spe)$gene_search)
                             ),
-                            options = pickerOptions(liveSearch = TRUE)
+                            options = pickerOptions(liveSearch = TRUE),
+                            multiple = TRUE,
+                            selected = c(
+                                golem::get_golem_options("spe_continuous_vars"),
+                                sort(rowData(spe)$gene_search)
+                            )[1]
                         ),
-                        helpText("Typically a gene or any other continuous variable."),
+                        helpText("Typically gene(s) or any other continuous variable(s)."),
+                        hr(),
+                        selectInput(
+                            inputId = "multi_gene_method",
+                            label = "Multi-gene method",
+                            choices = c("z_score", "pca", "sparsity"),
+                            selected = "z_score"
+                        ),
+                        helpText("When applicable, the method used to combine multiple continuous variables."),
                         hr(),
                         selectInput(
                             inputId = "assayname",
@@ -169,7 +183,7 @@ app_ui <- function() {
                         checkboxInput(
                             "auto_crop",
                             "Should the image be automatically cropped?",
-                            value = TRUE
+                            value = auto_crop_default
                         ),
                         hr(),
                         selectInput(
@@ -338,7 +352,8 @@ app_ui <- function() {
                                 tags$br(),
                                 tags$br(),
                                 tags$br(),
-                                tags$br()
+                                tags$br(),
+                                textOutput("gene_warnings")
                             ),
                             tabPanel(
                                 "Gene (interactive)",
@@ -408,6 +423,7 @@ app_ui <- function() {
                                 actionButton("gene_grid_update", label = "Update grid plot"),
                                 downloadButton("downloadPlotGeneGrid", "Download PDF"),
                                 uiOutput("gene_grid_static"),
+                                textOutput("gene_grid_warnings"),
                                 helpText("Click the 'upgrade grid plot' button above to re-make this plot."),
                                 tags$br(),
                                 tags$br(),
@@ -765,7 +781,7 @@ app_ui <- function() {
                                         helpText(
                                             "It should be a CSV file without row names and similar to ",
                                             HTML(
-                                                '<a href="https://github.com/LieberInstitute/spatialLIBD/blob/master/data-raw/asd_sfari_geneList.csv">this example file.</a>'
+                                                '<a href="https://github.com/LieberInstitute/spatialLIBD/blob/master/data-raw/asd_sfari_geneList.csv">this example file</a>. For more context, check <a href="https://www.nature.com/articles/s41593-020-00787-0#Fig6">this figure</a>.'
                                             )
                                         )
                                     ),
@@ -826,7 +842,7 @@ app_ui <- function() {
                                         helpText(
                                             "It should be a CSV file similar to ",
                                             HTML(
-                                                '<a href="https://github.com/LieberInstitute/spatialLIBD/blob/master/data-raw/tstats_Human_DLPFC_snRNAseq_Nguyen_topLayer.csv">this example file.</a>'
+                                                '<a href="https://github.com/LieberInstitute/spatialLIBD/blob/master/data-raw/tstats_Human_DLPFC_snRNAseq_Nguyen_topLayer.csv">this example file</a>, documented <a href="https://research.libd.org/spatialLIBD/reference/tstats_Human_DLPFC_snRNAseq_Nguyen_topLayer.html">here</a>. For more context, check <a href="https://www.nature.com/articles/s41593-020-00787-0#Fig5">this figure</a>.'
                                             )
                                         )
                                     ),
@@ -840,7 +856,25 @@ app_ui <- function() {
                                             max = 1,
                                             step = 0.01
                                         ),
-                                        helpText("Use a smaller positive number to change the range of the color scale used. Use 1 if you want the color range to reflect the maximum range of correlation values. Default: 0.81.")
+                                        helpText("Use a smaller positive number to change the range of the color scale used. Use 1 if you want the color range to reflect the maximum range of correlation values. Default: 0.81."),
+                                        numericInput(
+                                            "layer_confidence_threshold",
+                                            label = "Annotation confidence threshold",
+                                            value = 0.25,
+                                            min = 0,
+                                            max = 1,
+                                            step = 0.01
+                                        ),
+                                        helpText("Minimum correlation for a high confidence annotation. Higher values are more strict in annotating. Default: 0.25."),
+                                        numericInput(
+                                            "layer_cutoff_merge_ratio",
+                                            label = "Annotation cutoff merge ratio",
+                                            value = 0.25,
+                                            min = 0,
+                                            max = 1,
+                                            step = 0.01
+                                        ),
+                                        helpText("Merging threshold for the ratio of the difference between the current one to the next closest correlation, relative to the next closest correlation: (current - next_cor) / next_cor. Lower values are more strict in annotating. Default: 0.25.")
                                     )
                                 ),
                                 hr(),
@@ -862,6 +896,8 @@ app_ui <- function() {
                                 hr(),
                                 downloadButton("layer_downloadTstatCorTable", "Download CSV"),
                                 helpText("Correlation matrix that is visually illustrated with the previous plot."),
+                                downloadButton("layer_downloadTstatCor_annotation", "Download CSV"),
+                                helpText("Annotated clusters."),
                                 DT::DTOutput("layer_tstat_cor_table")
                             )
                         )
@@ -874,7 +910,7 @@ app_ui <- function() {
                 "Help or feedback",
                 tagList(
                     HTML(
-                        'Please get in touch with the <code>spatialLIBD</code> authors through the <a href="https://support.bioconductor.org/">Bioconductor Support Website</a> (using the <code>spatialLIBD</code> <a href="https://support.bioconductor.org/t/spatialLIBD/">tag</a>) or through <a href="https://github.com/LieberInstitute/spatialLIBD/issues">GitHub</a>. Remember to help others help you by including all the information required to reproduce the problem you noticed. Thank you!'
+                        'Please get in touch with the <code>spatialLIBD</code> authors through the <a href="https://support.bioconductor.org/">Bioconductor Support Website</a> (using the <code>spatialLIBD</code> <a href="https://support.bioconductor.org/tag/spatialLIBD/">tag</a>) or through <a href="https://github.com/LieberInstitute/spatialLIBD/issues">GitHub</a>. Remember to help others help you by including all the information required to reproduce the problem you noticed. Thank you!'
                     ),
                     hr(),
                     p("The following information will be useful to them:"),

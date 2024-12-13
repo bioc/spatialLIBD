@@ -23,20 +23,23 @@ vis_grid_gene(
   point_size = 2,
   auto_crop = TRUE,
   na_color = "#CCCCCC40",
+  is_stitched = FALSE,
   ...
 )
 }
 \arguments{
-\item{spe}{Defaults to the output of
-\code{fetch_data(type = 'spe')}. This is a
+\item{spe}{A
 \link[SpatialExperiment:SpatialExperiment]{SpatialExperiment-class}
-object with the spot-level Visium data and information required for
-visualizing the histology. See \code{\link[=fetch_data]{fetch_data()}} for more details.}
+object. See \code{\link[=fetch_data]{fetch_data()}} for how to download some example objects or
+\code{\link[=read10xVisiumWrapper]{read10xVisiumWrapper()}} to read in \code{spaceranger --count} output files and
+build your own \code{spe} object.}
 
-\item{geneid}{A \code{character(1)} specifying the gene ID stored in
-\code{rowData(spe)$gene_search} or a continuous variable stored in \code{colData(spe)}
-to visualize. If \code{rowData(spe)$gene_search} is missing, then \code{rownames(spe)}
-is used to search for the gene ID.}
+\item{geneid}{A \code{character()} specifying the gene ID(s) stored in
+\code{rowData(spe)$gene_search} or a continuous variable(s) stored in
+\code{colData(spe)} to visualize. For each ID, if \code{rowData(spe)$gene_search} is
+missing, then \code{rownames(spe)} is used to search for the gene ID. When a
+vector of length > 1 is supplied, the continuous variables are combined
+according to \code{multi_gene_method}, producing a single value for each spot.}
 
 \item{pdf_file}{A \code{character(1)} specifying the path for the resulting PDF.}
 
@@ -91,6 +94,13 @@ alpha blending already, which will make non-NA values pop up more and the NA
 values will show with a lighter color. This behavior is lost when \code{alpha} is
 set to a non-\code{NA} value.}
 
+\item{is_stitched}{A \code{logical(1)} vector: If \code{TRUE}, expects a
+\link[SpatialExperiment:SpatialExperiment]{SpatialExperiment-class} built
+with \code{visiumStitched::build_spe()}.
+\url{http://research.libd.org/visiumStitched/reference/build_spe.html}; in
+particular, expects a logical colData column \code{exclude_overlapping}
+specifying which spots to exclude from the plot. Sets \code{auto_crop = FALSE}.}
+
 \item{...}{Passed to \link[base:paste]{paste0()} for making the title of the
 plot following the \code{sampleid}.}
 }
@@ -129,7 +139,7 @@ if (enough_ram()) {
 }
 \seealso{
 Other Spatial gene visualization functions: 
-\code{\link{vis_gene_p}()},
-\code{\link{vis_gene}()}
+\code{\link{vis_gene}()},
+\code{\link{vis_gene_p}()}
 }
 \concept{Spatial gene visualization functions}

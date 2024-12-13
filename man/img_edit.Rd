@@ -26,11 +26,11 @@ img_edit(
 )
 }
 \arguments{
-\item{spe}{Defaults to the output of
-\code{fetch_data(type = 'spe')}. This is a
+\item{spe}{A
 \link[SpatialExperiment:SpatialExperiment]{SpatialExperiment-class}
-object with the spot-level Visium data and information required for
-visualizing the histology. See \code{\link[=fetch_data]{fetch_data()}} for more details.}
+object. See \code{\link[=fetch_data]{fetch_data()}} for how to download some example objects or
+\code{\link[=read10xVisiumWrapper]{read10xVisiumWrapper()}} to read in \code{spaceranger --count} output files and
+build your own \code{spe} object.}
 
 \item{sampleid}{A \code{character(1)} specifying which sample to plot from
 \code{colData(spe)$sample_id} (formerly \code{colData(spe)$sample_name}).}
@@ -108,7 +108,7 @@ if (enough_ram()) {
 }
 \seealso{
 Other Image editing functions: 
-\code{\link{img_update_all}()},
-\code{\link{img_update}()}
+\code{\link{img_update}()},
+\code{\link{img_update_all}()}
 }
 \concept{Image editing functions}

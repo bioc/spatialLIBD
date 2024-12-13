@@ -6,9 +6,13 @@
 \usage{
 fetch_data(
   type = c("sce", "sce_layer", "modeling_results", "sce_example", "spe",
-    "spatialDLPFC_Visium", "spatialDLPFC_Visium_pseudobulk",
-    "spatialDLPFC_Visium_modeling_results", "spatialDLPFC_Visium_SPG",
-    "spatialDLPFC_snRNAseq"),
+    "spatialDLPFC_Visium", "spatialDLPFC_Visium_example_subset",
+    "spatialDLPFC_Visium_pseudobulk", "spatialDLPFC_Visium_modeling_results",
+    "spatialDLPFC_Visium_SPG", "spatialDLPFC_snRNAseq",
+    "Visium_SPG_AD_Visium_wholegenome_spe", "Visium_SPG_AD_Visium_targeted_spe",
+    "Visium_SPG_AD_Visium_wholegenome_pseudobulk_spe",
+    "Visium_SPG_AD_Visium_wholegenome_modeling_results", "visiumStitched_brain_spe",
+    "visiumStitched_brain_spaceranger", "visiumStitched_brain_Fiji_out"),
   destdir = tempdir(),
   eh = ExperimentHub::ExperimentHub(),
   bfc = BiocFileCache::BiocFileCache()
@@ -26,10 +30,14 @@ object containing the layer-level data (pseudo-bulked from the spot-level),
 or \code{modeling_results} for the list of tables with the \code{enrichment},
 \code{pairwise}, and \code{anova} model results from the layer-level data. It can also
 be \code{sce_example} which is a reduced version of \code{sce} just for example
-purposes. As of BioC version 3.13 \code{spe} downloads a
+purposes. The initial version of \code{spatialLIBD} downloaded data only from
+\url{https://github.com/LieberInstitute/HumanPilot}. As of BioC version 3.13
+\code{spe} downloads a
 \link[SpatialExperiment:SpatialExperiment]{SpatialExperiment-class}  object.
-As of version 1.11.6 this function also allows downloading data from the
-\url{http://research.libd.org/spatialDLPFC/} project.}
+As of version 1.11.6, this function also allows downloading data from the
+\url{http://research.libd.org/spatialDLPFC/} project. As of version 1.11.12,
+data from \url{https://github.com/LieberInstitute/Visium_SPG_AD} can be
+downloaded.}
 
 \item{destdir}{The destination directory to where files will be downloaded
 to in case the \code{ExperimentHub} resource is not available. If you already
@@ -49,13 +57,15 @@ you have to assign to an object. If you didn't you can still avoid
 re-loading the object by using \code{.Last.value}.
 }
 \description{
-This function downloads from \code{ExperimentHub} the dorsolateral prefrontal
-cortex (DLPFC) human Visium data and results analyzed by LIBD. If
-\code{ExperimentHub} is not available, it will download the files from Dropbox
-using \code{\link[utils:download.file]{utils::download.file()}} unless the files are present already at
-\code{destdir}. Note that \code{ExperimentHub} will cache the data and automatically
-detect if you have previously downloaded it, thus making it the preferred
-way to interact with the data.
+This function downloads from \code{ExperimentHub} Visium, Visium Spatial
+Proteogenomics (Visium-SPG), or single nucleus RNA-seq (snRNA-seq) data
+and results analyzed by LIBD from multiple projects.
+If \code{ExperimentHub} is not available, this function will
+download the files from Dropbox using \code{\link[BiocFileCache:BiocFileCache-class]{BiocFileCache::bfcrpath()}} unless the
+files are present already at \code{destdir}. Note that \code{ExperimentHub} and
+\code{BiocFileCache} will cache the data and automatically detect if you have
+previously downloaded it, thus making it the preferred way to interact with
+the data.
 }
 \details{
 The data was initially prepared by scripts at
@@ -70,4 +80,27 @@ if (!exists("sce_layer")) sce_layer <- fetch_data("sce_layer")
 
 ## Explore the data
 sce_layer
+
+## How to download and load "spatialDLPFC_snRNAseq"
+\dontrun{
+sce_path_zip <- fetch_data("spatialDLPFC_snRNAseq")
+sce_path <- unzip(sce_path_zip, exdir = tempdir())
+sce <- HDF5Array::loadHDF5SummarizedExperiment(
+    file.path(tempdir(), "sce_DLPFC_annotated")
+)
+sce
+#> class: SingleCellExperiment
+#> dim: 36601 77604
+#> metadata(3): Samples cell_type_colors cell_type_colors_broad
+#> assays(2): counts logcounts
+#> rownames(36601): MIR1302-2HG FAM138A ... AC007325.4 AC007325.2
+#> rowData names(7): source type ... gene_type binomial_deviance
+#> colnames(77604): 1_AAACCCAAGTTCTCTT-1 1_AAACCCACAAGGTCTT-1 ... 19_TTTGTTGTCTCATTGT-1 19_TTTGTTGTCTTAAGGC-1
+#> colData names(32): Sample Barcode ... cellType_layer layer_annotation
+#> reducedDimNames(4): GLMPCA_approx TSNE UMAP HARMONY
+#> mainExpName: NULL
+#> altExpNames(0):
+lobstr::obj_size(sce)
+#> 172.28 MB
+}
 }

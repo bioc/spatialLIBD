@@ -6,8 +6,8 @@
 #' gene-level (or any continuous variable) use [vis_gene_p()].
 #'
 #' @inheritParams vis_clus
-#' @param d A data.frame with the sample-level information. This is typically
-#' obtained using `cbind(colData(spe), spatialCoords(spe))`.
+#' @param d A `data.frame()` with the sample-level information. This is
+#' typically obtained using `cbind(colData(spe), spatialCoords(spe))`.
 #' @param title The title for the plot.
 #'
 #' @return A [ggplot2][ggplot2::ggplot] object.
@@ -42,18 +42,18 @@
 #'     rm(spe_sub)
 #' }
 vis_clus_p <-
-    function(
-        spe,
-        d,
-        clustervar,
-        sampleid = unique(spe$sample_id)[1],
-        colors,
-        spatial,
-        title,
-        image_id = "lowres",
-        alpha = NA,
-        point_size = 2,
-        auto_crop = TRUE) {
+    function(spe,
+    d,
+    clustervar,
+    sampleid = unique(spe$sample_id)[1],
+    colors,
+    spatial,
+    title,
+    image_id = "lowres",
+    alpha = NA,
+    point_size = 2,
+    auto_crop = TRUE,
+    na_color = "#CCCCCC40") {
         ## Some variables
         pxl_row_in_fullres <- pxl_col_in_fullres <- key <- NULL
         # stopifnot(all(c("pxl_col_in_fullres", "pxl_row_in_fullres", "key") %in% colnames(d)))
@@ -113,7 +113,7 @@ vis_clus_p <-
                 alpha = alpha
             ) +
             coord_fixed(expand = FALSE) +
-            scale_fill_manual(values = colors) +
+            scale_fill_manual(values = colors, na.value = na_color) +
             xlim(0, ncol(img)) +
             ylim(nrow(img), 0) +
             xlab("") + ylab("") +

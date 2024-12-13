@@ -15,15 +15,17 @@ vis_clus(
   alpha = NA,
   point_size = 2,
   auto_crop = TRUE,
+  na_color = "#CCCCCC40",
+  is_stitched = FALSE,
   ...
 )
 }
 \arguments{
-\item{spe}{Defaults to the output of
-\code{fetch_data(type = 'spe')}. This is a
+\item{spe}{A
 \link[SpatialExperiment:SpatialExperiment]{SpatialExperiment-class}
-object with the spot-level Visium data and information required for
-visualizing the histology. See \code{\link[=fetch_data]{fetch_data()}} for more details.}
+object. See \code{\link[=fetch_data]{fetch_data()}} for how to download some example objects or
+\code{\link[=read10xVisiumWrapper]{read10xVisiumWrapper()}} to read in \code{spaceranger --count} output files and
+build your own \code{spe} object.}
 
 \item{sampleid}{A \code{character(1)} specifying which sample to plot from
 \code{colData(spe)$sample_id} (formerly \code{colData(spe)$sample_name}).}
@@ -51,6 +53,19 @@ to \code{1.25}. Some colors look better if you use \code{2} for instance.}
 \item{auto_crop}{A \code{logical(1)} indicating whether to automatically crop
 the image / plotting area, which is useful if the Visium capture area is
 not centered on the image and if the image is not a square.}
+
+\item{na_color}{A \code{character(1)} specifying a color for the NA values.
+If you set \code{alpha = NA} then it's best to set \code{na_color} to a color that has
+alpha blending already, which will make non-NA values pop up more and the NA
+values will show with a lighter color. This behavior is lost when \code{alpha} is
+set to a non-\code{NA} value.}
+
+\item{is_stitched}{A \code{logical(1)} vector: If \code{TRUE}, expects a
+\link[SpatialExperiment:SpatialExperiment]{SpatialExperiment-class} built
+with \code{visiumStitched::build_spe()}.
+\url{http://research.libd.org/visiumStitched/reference/build_spe.html}; in
+particular, expects a logical colData column \code{exclude_overlapping}
+specifying which spots to exclude from the plot. Sets \code{auto_crop = FALSE}.}
 
 \item{...}{Passed to \link[base:paste]{paste0()} for making the title of the
 plot following the \code{sampleid}.}
@@ -107,6 +122,19 @@ if (enough_ram()) {
         spatial = FALSE
     )
     print(p3)
+
+    ## With some NA values
+    spe$tmp <- spe$layer_guess_reordered
+    spe$tmp[spe$sample_id == "151673"][seq_len(500)] <- NA
+    p4 <- vis_clus(
+        spe = spe,
+        clustervar = "tmp",
+        sampleid = "151673",
+        colors = libd_layer_colors,
+        na_color = "white",
+        ... = " LIBD Layers"
+    )
+    print(p4)
 }
 }
 \seealso{

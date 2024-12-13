@@ -3,12 +3,12 @@
 #' This function visualizes the gene expression stored in `assays(spe)` or any
 #' continuous variable stored in `colData(spe)` for one given sample at the
 #' spot-level using (by default) the histology information on the background.
-#' This is the function that does all the plotting behind [vis_gene()].
+#' This is the function that does all the plotting behind [vis_gene()]
 #' To visualize clusters (or any discrete variable) use [vis_clus_p()].
 #'
-#' @param d A data.frame with the sample-level information. This is typically
-#' obtained using `cbind(colData(spe), spatialCoords(spe))`.
-#' The data.frame has to contain
+#' @param d A `data.frame()` with the sample-level information. This is
+#' typically obtained using `cbind(colData(spe), spatialCoords(spe))`.
+#' The `data.frame` has to contain
 #' a column with the continuous variable data to plot stored under `d$COUNT`.
 #' @param legend_title A `character(1)` specifying the legend title.
 #' @inheritParams vis_clus_p
@@ -33,7 +33,6 @@
 #'     df <- as.data.frame(cbind(colData(spe_sub), SpatialExperiment::spatialCoords(spe_sub)), optional = TRUE)
 #'     df$COUNT <- df$expr_chrM_ratio
 #'
-#'     ## Use the manual color palette by Lukas M Weber
 #'     ## Don't plot the histology information
 #'     p <- vis_gene_p(
 #'         spe = spe_sub,
@@ -48,24 +47,19 @@
 #'     rm(spe_sub)
 #' }
 vis_gene_p <-
-    function(
-        spe,
-        d,
-        sampleid = unique(spe$sample_id)[1],
-        spatial,
-        title,
-        viridis = TRUE,
-        image_id = "lowres",
-        alpha = NA,
-        cont_colors = if (viridis) {
-            viridisLite::viridis(21)
-        } else {
-            c("aquamarine4", "springgreen", "goldenrod", "red")
-        },
-        point_size = 2,
-        auto_crop = TRUE,
-        na_color = "#CCCCCC40",
-        legend_title = "") {
+    function(spe,
+    d,
+    sampleid = unique(spe$sample_id)[1],
+    spatial,
+    title,
+    viridis = TRUE,
+    image_id = "lowres",
+    alpha = NA,
+    cont_colors = if (viridis) viridisLite::viridis(21) else c("aquamarine4", "springgreen", "goldenrod", "red"),
+    point_size = 2,
+    auto_crop = TRUE,
+    na_color = "#CCCCCC40",
+    legend_title = "") {
         ## Some variables
         pxl_row_in_fullres <-
             pxl_col_in_fullres <- key <- COUNT <- NULL

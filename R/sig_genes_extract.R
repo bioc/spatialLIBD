@@ -12,7 +12,8 @@
 #' columns `f_stat_*` or `t_stat_*` as well as `p_value_*` and `fdr_*` plus
 #' `ensembl`. The column name is used to extract the statistic results, the
 #' p-values, and the FDR adjusted p-values. Then the `ensembl` column is used
-#' for matching in some cases. See [fetch_data()] for more details.
+#' for matching in some cases. See [fetch_data()] for more details. Typically
+#' this is the set of reference statistics used in `layer_stat_cor()`.
 #' @param model_type A named element of the `modeling_results` list. By default
 #' that is either `enrichment` for the model that tests one human brain layer
 #' against the rest (one group vs the rest), `pairwise` which compares two
@@ -59,11 +60,12 @@
 #'     sce_layer = sce_layer,
 #'     n = nrow(sce_layer)
 #' )
-sig_genes_extract <- function(n = 10,
-    modeling_results = fetch_data(type = "modeling_results"),
-    model_type = names(modeling_results)[1],
-    reverse = FALSE,
-    sce_layer = fetch_data(type = "sce_layer")) {
+sig_genes_extract <- function(
+        n = 10,
+        modeling_results = fetch_data(type = "modeling_results"),
+        model_type = names(modeling_results)[1],
+        reverse = FALSE,
+        sce_layer = fetch_data(type = "sce_layer")) {
     model_results <- modeling_results[[model_type]]
 
     tstats <-

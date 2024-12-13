@@ -8,7 +8,9 @@
 #' object or one that inherits its properties.
 #' @param var_registration A `character(1)` specifying the `colData(sce)`
 #' variable of interest against which will be used for computing the relevant
-#' statistics.
+#' statistics. This should be a categorical variable, with all categories
+#' syntaticly valid (could be used as an R variable, no special characters or
+#' leading numbers), ex. 'L1.2', 'celltype2' not 'L1/2' or '2'.
 #' @param var_sample_id A `character(1)` specifying the `colData(sce)` variable
 #' with the sample ID.
 #' @param covars A `character()` with names of sample-level covariates.
@@ -51,13 +53,12 @@
 #' sce_pseudo <- registration_pseudobulk(sce, "Cell_Cycle", "sample_id", c("age"), min_ncells = NULL)
 #' colData(sce_pseudo)
 registration_pseudobulk <-
-    function(
-        sce,
-        var_registration,
-        var_sample_id,
-        covars = NULL,
-        min_ncells = 10,
-        pseudobulk_rds_file = NULL) {
+    function(sce,
+    var_registration,
+    var_sample_id,
+    covars = NULL,
+    min_ncells = 10,
+    pseudobulk_rds_file = NULL) {
         ## Check that inputs are correct
         stopifnot(is(sce, "SingleCellExperiment"))
         stopifnot(var_registration %in% colnames(colData(sce)))
@@ -71,15 +72,34 @@ registration_pseudobulk <-
         stopifnot(!var_sample_id %in% covars)
         stopifnot(var_registration != var_sample_id)
 
-        ## Check that the values in the registration variable are ok
-        uniq_var_regis <- unique(sce[[var_registration]])
-        if (any(grepl("\\+|\\-", uniq_var_regis))) {
-            stop(
-                "Remove the + and - signs in colData(sce)[, '",
-                var_registration,
-                "'] to avoid downstream issues.",
+        ## Check that the values in the registration variable are numeric
+        if (is.numeric(sce[[var_registration]])) {
+            warning(
+                sprintf(
+                    "var_registration \"%s\" is numeric, convering to categorical vector...",
+                    var_registration
+                ),
                 call. = FALSE
             )
+        }
+
+        ## check for Non-Syntactic variables - convert with make.names & warn
+        uniq_var_regis <- unique(sce[[var_registration]])
+        syntatic <- grepl(
+            "^((([[:alpha:]]|[.][._[:alpha:]])[._[:alnum:]]*)|[.])$",
+            uniq_var_regis
+        )
+        if (!all(syntatic)) {
+            warning(
+                sprintf(
+                    "var_registration \"%s\" contains non-syntatic variables: %s\nconverting to %s",
+                    var_registration,
+                    paste(uniq_var_regis[!syntatic], collapse = ", "),
+                    paste(make.names(uniq_var_regis[!syntatic]), collapse = ", ")
+                ),
+                call. = FALSE
+            )
+            sce[[var_registration]] <- make.names(sce[[var_registration]])
         }
 
         ## Pseudo-bulk for our current BayesSpace cluster results
@@ -124,6 +144,12 @@ registration_pseudobulk <-
                 " pseudo-bulked samples that are below 'min_ncells'."
             )
             sce_pseudo <- sce_pseudo[, sce_pseudo$ncells >= min_ncells]
+        }
+
+        if (is.factor(sce_pseudo$registration_variable)) {
+            ## Drop unused var_registration levels if we had to drop some due
+            ## to min_ncells
+            sce_pseudo$registration_variable <- droplevels(sce_pseudo$registration_variable)
         }
 
         ## Drop lowly-expressed genes

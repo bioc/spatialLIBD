@@ -1,3 +1,178 @@
+# spatialLIBD 1.19.3
+
+BUG FIXES
+
+* Resolved <https://github.com/LieberInstitute/spatialLIBD/issues/90> which made
+`add_key()` too strict and would create issues with `export_cluster()`. Reported
+by @lahuuki and @manishabarse.
+
+# spatialLIBD 1.19.2
+
+BUG FIXES
+
+* Merged <https://github.com/LieberInstitute/spatialLIBD/pull/92> by @lahuuki.
+This fixes https://github.com/LieberInstitute/spatialLIBD/issues/72 and
+https://github.com/LieberInstitute/spatialLIBD/issues/48 by making 
+`registration_pseudobulk()` more robust. The original issues were reported by
+@boyiguo1 and @berniejmulvey.
+
+# spatialLIBD 1.19.1
+
+NEW FEATURES
+
+* Merged <https://github.com/LieberInstitute/spatialLIBD/pull/91> by @lahuuki.
+This pull request fully re-implemented `layer_stat_cor_plot()` with a version
+that uses `ComplexHeatmap::Heatmap()` internally. It also adds support for
+incorporating the automatic annotation results from
+`annotate_registered_clusters()`. NOTE that the `max` argument was renamed to
+`color_max`, as well as `min` to `color_min`. Also, the default for `min` used
+to be `-max` and now for `color_min` the default is the `min()` correlation
+observed. The default for `max` was 0.81 and the default for `color_max()` is
+the `max()` observed correlation.
+* `run_app()` was also updated to match the updated in `layer_stat_cor_plot()`
+and now has 2 new inputs for controlling the annotation process with
+`annotate_registered_clusters()`. It also allows downloading a CSV file with
+the annotation results.
+
+
+# spatialLIBD 1.17.10
+
+BUG FIXES
+
+* `registration_wrapper()` now automatically handles the scenario where `k = 2`
+by not using `registration_stats_anova()` and providing an apporpriate warning.
+Implemented by @lahuuki at 
+<https://github.com/LieberInstitute/spatialLIBD/pull/86>.
+
+# spatialLIBD 1.17.9
+
+BUG FIXES
+
+* `read10xVisiumWrapper()` is now able to detect the GTF file used by
+`SpaceRanger` for version 3.0.0+. Implemented by @nick-eagles at
+<https://github.com/LieberInstitute/spatialLIBD/pull/88>.
+
+
+# spatialLIBD 1.17.6
+
+BUG FIXES
+
+* Fixed the bug reported by @lahuuki about `vis_grid_clus()` not handling
+`logical()` cluster variables.
+See <https://github.com/LieberInstitute/spatialLIBD/issues/80>. To resolve this,
+`sort_clusters()` and `get_colors()` had to change internally. Examples and
+documentation for both functions have now been updated to showcase what happens
+when you provide a `logical()` vector as an input.
+
+# spatialLIBD 1.17.5
+
+NEW FEATURES
+
+* Added `add_qc_metrics()` inspired by 
+<https://github.com/LieberInstitute/Visium_SPG_AD/blob/master/code/07_spot_qc/01_qc_metrics_and_segmentation.R>
+which adds seven new columns to the `colData(spe)` that can be useful when
+performing quality control of the data. Developed by @lahuuki.
+
+# spatialLIBD 1.17.3
+
+NEW FEATURES
+
+* Added support for `SpatialExperiment` objects created with
+`visiumStitched::build_spe()` 
+<https://research.libd.org/visiumStitched/reference/build_spe.html> that 
+stitch together multiple Visium capture areas. Developed by @Nick-Eagles.
+
+# spatialLIBD 1.15.2
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+* `vis_gene()` now has a `multi_gene_method` argument which provides 3 methods
+for combining multiple continuous variables: `z_score`, `pca`, and `sparsity`.
+These options can now be used with `run_app()` (the interactive websites). These
+methods are further illustrated and documented in a new vignette available at
+<https://research.libd.org/spatialLIBD/articles/multi_gene_plots.html>. This
+work was contributed by @Nick-Eagles.
+
+# spatialLIBD 1.13.6
+
+NEW FEATURES
+
+* `vis_clus_p()`, `vis_clus()`, and `vis_grid_clus()` now all use implement the
+`na_color` argument that was present in the `vis_gene()` functions. This
+resolves https://github.com/LieberInstitute/spatialLIBD/issues/43 by @boyiguo1.
+
+# spatialLIBD 1.13.5
+
+NEW FEATURES
+
+* `run_app()` now has a `auto_crop_default` argument set to `TRUE` by default.
+It can be turned off in cases where you are displaying images that do not
+follow the expected Visium grid dimensions, such as manually stitched images
+that you don't want to automatically crop.
+
+# spatialLIBD 1.13.4
+
+NEW FEATURES
+
+* Added `fetch_data("spatialDLPFC_Visium_example_subset")` which is a subset
+of 3 samples with only the `lowres` images that can be used for example /
+tutorial purposes.
+
+# spatialLIBD 1.13.2
+
+NEW FEATURES
+
+* Louise A. Huuki-Myers @lahuuki added a vignette explaining the spatial
+registration process and all related functions. See
+<https://github.com/LieberInstitute/spatialLIBD/pull/46> for the full pull
+request.
+
+# spatialLIBD 1.11.13
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+* The vignette now has a section describing the data from the `spatialDLFPC`,
+`Visium_SPG_AD`, and `locus-c` projects that were done by members of the
+Keri Martinowich, Kristen R. Maynard, and Leonardo Collado-Torres LIBD teams as
+well as our collaborators.
+
+# spatialLIBD 1.11.12
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+* `fetch_data("Visium_SPG_AD_Visium_wholegenome_spe"")`,
+`fetch_data("Visium_SPG_AD_Visium_targeted_spe")`,
+`fetch_data("Visium_SPG_AD_Visium_wholegenome_pseudobulk_spe")`, and
+ `fetch_data("Visium_SPG_AD_Visium_wholegenome_modeling_results")` have been
+ added. Use this to access data from the
+ <https://github.com/LieberInstitute/Visium_SPG_AD> project.
+
+# spatialLIBD 1.11.11
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+* `fetch_data("spatialDLPFC_snRNAseq")` now works if you want to download
+the snRNA-seq data used in <http://research.libd.org/spatialDLPFC/>.
+
+# spatialLIBD 1.11.10
+
+BUG FIXES
+
+* `read10xVisiumAnalysis()` now supports `spaceranger` version 2023.0208.0
+(internal 10x Genomics version) output files that store analysis CSVs under the
+`outs/analysis_csv` directory instead of `outs/analysis` and also use the
+`gene_expression_` prefix for each of the analysis directories. This was
+tested with @heenadivecha on files from
+<https://github.com/LieberInstitute/spatial_DG_lifespan/blob/main/code/02_build_spe/01_build_spe.R>.
+
+# spatialLIBD 1.11.9
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+* `gene_set_enrichment()` now internally uses
+`fisher.test(alternative = "greater")` to test for odds ratios greater than 1.
+Otherwise odds ratios of 0 could be significant.
+
 # spatialLIBD 1.11.4
 
 SIGNIFICANT USER-VISIBLE CHANGES

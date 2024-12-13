@@ -25,12 +25,13 @@ app_server <- function(input, output, session) {
     modeling_results <- golem::get_golem_options("modeling_results")
     sig_genes <- golem::get_golem_options("sig_genes")
     default_cluster <- golem::get_golem_options("default_cluster")
+    is_stitched <- golem::get_golem_options("is_stitched")
 
 
     # List the first level callModules here
 
     ## Global variables needed throughout the app
-    rv <- reactiveValues(ManualAnnotation = rep("NA", ncol(spe)))
+    rv <- reactiveValues(ManualAnnotation = rep("NA", ncol(spe)), ContCount = data.frame(key = spe$key, COUNT = NA))
 
     ## From /dcs04/lieber/lcolladotor/with10x_LIBD001/HumanPilot/Analysis/rda_scran/clust_10x_layer_maynard_martinowich.Rdata
     # cat(paste0("'", names(cols_layers_martinowich), "' = '", cols_layers_martinowich, "',\n"))
@@ -171,6 +172,7 @@ app_server <- function(input, output, session) {
             alpha = input$alphalevel,
             point_size = input$pointsize,
             auto_crop = input$auto_crop,
+            is_stitched = is_stitched,
             ... = paste(" with", input$cluster)
         )
         if (!input$side_by_side_histology) {
@@ -211,6 +213,7 @@ app_server <- function(input, output, session) {
                 sample_order = isolate(input$grid_samples),
                 point_size = isolate(input$pointsize),
                 auto_crop = isolate(input$auto_crop),
+                is_stitched = is_stitched,
                 ... = paste(" with", isolate(input$cluster))
             )
         cowplot::plot_grid(
@@ -221,60 +224,86 @@ app_server <- function(input, output, session) {
     })
 
     static_gene <- reactive({
-        p <- vis_gene(
-            spe,
-            sampleid = input$sample,
-            geneid = input$geneid,
-            assayname = input$assayname,
-            minCount = input$minCount,
-            cont_colors = cont_colors(),
-            image_id = input$imageid,
-            alpha = input$alphalevel,
-            point_size = input$pointsize,
-            auto_crop = input$auto_crop
-        )
-        if (!input$side_by_side_gene) {
-            return(p)
-        } else {
-            p_no_spots <- p
-            p_no_spots$layers[[2]] <- NULL
+        gene_warning <- NULL
+        withCallingHandlers(
+            {
+                p <- vis_gene(
+                    spe,
+                    sampleid = input$sample,
+                    geneid = input$geneid,
+                    multi_gene_method = input$multi_gene_method,
+                    assayname = input$assayname,
+                    minCount = input$minCount,
+                    cont_colors = cont_colors(),
+                    image_id = input$imageid,
+                    alpha = input$alphalevel,
+                    point_size = input$pointsize,
+                    auto_crop = input$auto_crop,
+                    is_stitched = is_stitched
+                )
+                if (!input$side_by_side_gene) {
+                    p_result <- p
+                } else {
+                    p_no_spots <- p
+                    p_no_spots$layers[[2]] <- NULL
 
-            p_no_spatial <- p
-            p_no_spatial$layers[[1]] <- NULL
-            cowplot::plot_grid(
-                plotlist = list(
-                    p_no_spots,
-                    p_no_spatial + ggplot2::theme(legend.position = "none")
-                ),
-                nrow = 1,
-                ncol = 2
-            )
-        }
+                    p_no_spatial <- p
+                    p_no_spatial$layers[[1]] <- NULL
+                    p_result <- cowplot::plot_grid(
+                        plotlist = list(
+                            p_no_spots,
+                            p_no_spatial + ggplot2::theme(legend.position = "none")
+                        ),
+                        nrow = 1,
+                        ncol = 2
+                    )
+                }
+            },
+            warning = function(w) {
+                gene_warning <<- conditionMessage(w)
+                invokeRestart("muffleWarning")
+            }
+        )
+        return(list(p = p_result, gene_warning = gene_warning))
     })
 
     static_gene_grid <- reactive({
         input$gene_grid_update
 
-        plots <-
-            vis_grid_gene(
-                spe,
-                geneid = isolate(input$geneid),
-                assayname = isolate(input$assayname),
-                minCount = isolate(input$minCount),
-                return_plots = TRUE,
-                spatial = isolate(input$grid_spatial_gene),
-                cont_colors = isolate(cont_colors()),
-                image_id = isolate(input$imageid),
-                alpha = isolate(input$alphalevel),
-                point_size = isolate(input$pointsize),
-                sample_order = isolate(input$gene_grid_samples),
-                auto_crop = isolate(input$auto_crop)
-            )
-        cowplot::plot_grid(
+        gene_grid_warnings <- NULL
+        withCallingHandlers(
+            {
+                plots <-
+                    vis_grid_gene(
+                        spe,
+                        geneid = isolate(input$geneid),
+                        multi_gene_method = input$multi_gene_method,
+                        assayname = isolate(input$assayname),
+                        minCount = isolate(input$minCount),
+                        return_plots = TRUE,
+                        spatial = isolate(input$grid_spatial_gene),
+                        cont_colors = isolate(cont_colors()),
+                        image_id = isolate(input$imageid),
+                        alpha = isolate(input$alphalevel),
+                        point_size = isolate(input$pointsize),
+                        sample_order = isolate(input$gene_grid_samples),
+                        auto_crop = isolate(input$auto_crop),
+                        is_stitched = is_stitched
+                    )
+            },
+            warning = function(w) {
+                gene_grid_warnings <<- c(gene_grid_warnings, conditionMessage(w))
+                invokeRestart("muffleWarning")
+            }
+        )
+
+        p_result <- cowplot::plot_grid(
             plotlist = plots,
             nrow = isolate(input$gene_grid_nrow),
             ncol = isolate(input$gene_grid_ncol)
         )
+
+        return(list(p = p_result, gene_grid_warnings = gene_grid_warnings))
     })
 
     editImg_manipulations <- reactive({
@@ -416,7 +445,7 @@ app_server <- function(input, output, session) {
                 "_",
                 paste0(
                     "spatialLIBD_static_gene_",
-                    input$geneid,
+                    paste0(input$geneid, collapse = "_"),
                     "_",
                     input$sample,
                     "_",
@@ -432,7 +461,7 @@ app_server <- function(input, output, session) {
                 height = 8,
                 width = 8 * ifelse(input$side_by_side_gene, 2, 1)
             )
-            print(static_gene())
+            print(static_gene()[["p"]])
             dev.off()
         }
     )
@@ -444,7 +473,7 @@ app_server <- function(input, output, session) {
                 "_",
                 paste0(
                     "spatialLIBD_static_gene_grid_",
-                    input$geneid,
+                    paste0(input$geneid, collapse = "_"),
                     "_",
                     paste0(input$grid_samples, collapse = "_"),
                     "_",
@@ -460,7 +489,7 @@ app_server <- function(input, output, session) {
                 height = 8 * isolate(input$gene_grid_nrow),
                 width = 8 * isolate(input$gene_grid_ncol)
             )
-            print(static_gene_grid())
+            print(static_gene_grid()[["p"]])
             dev.off()
         }
     )
@@ -523,16 +552,34 @@ app_server <- function(input, output, session) {
         height = "auto"
     )
 
-
     output$gene <- renderPlot(
         {
-            static_gene()
+            static_gene()[["p"]]
         },
         width = function() {
             600 * ifelse(input$side_by_side_gene, 2, 1)
         },
         height = 600
     )
+
+    output$gene_warnings <- renderText({
+        #   Since 'static_gene()' is invoked twice (once also in the assignment
+        #   of 'output$gene'), we silence any errors that occur in this second
+        #   invocation to not duplicate error messages
+        this_warning <- NULL
+        temp <- try(
+            {
+                this_warning <- static_gene()[["gene_warning"]]
+            },
+            silent = TRUE
+        )
+
+        if (!is.null(this_warning)) {
+            paste("Warning:", this_warning)
+        } else {
+            ""
+        }
+    })
 
 
     output$gene_grid_static <- renderUI({
@@ -547,11 +594,30 @@ app_server <- function(input, output, session) {
 
     output$gene_grid <- renderPlot(
         {
-            print(static_gene_grid())
+            print(static_gene_grid()[["p"]])
         },
         width = "auto",
         height = "auto"
     )
+
+    output$gene_grid_warnings <- renderText({
+        #   Since 'static_gene_grid()' is invoked twice (once also in the
+        #   assignment of 'output$gene_grid'), we silence any errors that occur
+        #   in this second invocation to not duplicate error messages
+        these_warnings <- NULL
+        temp <- try(
+            {
+                these_warnings <- static_gene_grid()[["gene_grid_warnings"]]
+            },
+            silent = TRUE
+        )
+
+        if (!is.null(these_warnings)) {
+            paste("Warnings:", paste(these_warnings, collapse = "; "))
+        } else {
+            ""
+        }
+    })
 
     output$editImg_plot <- renderPlot(
         {
@@ -605,22 +671,77 @@ app_server <- function(input, output, session) {
         }
 
         ## From vis_gene() in global.R
+        spe_sub <- spe[, spe$sample_id == sampleid]
+
+        point_size <- input$pointsize
+        if (is_stitched) {
+            #   Drop excluded spots and calculate an appropriate point size
+            temp <- prep_stitched_data(spe_sub, point_size, input$imageid)
+            spe_sub <- temp$spe
+            point_size <- temp$point_size
+        }
+
         d <-
-            as.data.frame(cbind(colData(spe), SpatialExperiment::spatialCoords(spe))[spe$sample_id == sampleid, ],
+            as.data.frame(cbind(colData(spe_sub), SpatialExperiment::spatialCoords(spe_sub)),
                 optional = TRUE
             )
-        if (geneid %in% colnames(d)) {
-            d$COUNT <- d[[geneid]]
+        #   Grab any continuous colData columns
+        cont_cols <- as.matrix(
+            colData(spe_sub)[
+                , geneid[geneid %in% colnames(colData(spe_sub))],
+                drop = FALSE
+            ]
+        )
+
+        #   Get the integer indices of each gene in the SpatialExperiment, since we
+        #   aren't guaranteed that rownames are gene names
+        remaining_geneid <- geneid[!(geneid %in% colnames(colData(spe_sub)))]
+        valid_gene_indices <- unique(
+            c(
+                match(remaining_geneid, rowData(spe_sub)$gene_search),
+                match(remaining_geneid, rownames(spe_sub))
+            )
+        )
+        valid_gene_indices <- valid_gene_indices[!is.na(valid_gene_indices)]
+
+        #   Grab any genes
+        gene_cols <- t(
+            as.matrix(assays(spe_sub[valid_gene_indices, ])[[assayname]])
+        )
+
+        #   Combine into one matrix where rows are genes and columns are continuous
+        #   features
+        cont_matrix <- cbind(cont_cols, gene_cols)
+
+        #   Determine plot and legend titles
+        if (ncol(cont_matrix) == 1) {
+            if (!(geneid %in% colnames(colData(spe_sub)))) {
+                plot_title <- sprintf(
+                    "%s %s %s min > %s", sampleid, geneid, assayname, minCount
+                )
+            } else {
+                plot_title <- sprintf(
+                    "%s %s min > %s", sampleid, geneid, minCount
+                )
+            }
+            d$COUNT <- cont_matrix[, 1]
         } else {
-            d$COUNT <-
-                assays(spe)[[assayname]][which(rowData(spe)$gene_search == geneid), spe$sample_id == sampleid]
+            if (input$multi_gene_method == "z_score") {
+                d$COUNT <- multi_gene_z_score(cont_matrix)
+                plot_title <- paste(sampleid, "Z-score min > ", minCount)
+            } else if (input$multi_gene_method == "sparsity") {
+                d$COUNT <- multi_gene_sparsity(cont_matrix)
+                plot_title <- paste(sampleid, "Prop. nonzero min > ", minCount)
+            } else { # must be 'pca'
+                d$COUNT <- multi_gene_pca(cont_matrix)
+                plot_title <- paste(sampleid, "PC1 min >", minCount)
+            }
         }
         d$COUNT[d$COUNT <= minCount] <- NA
 
         ## Add the reduced dims
         if (reduced_name != "") {
-            red_dims <-
-                reducedDim(spe, reduced_name)[spe$sample_id == sampleid, ]
+            red_dims <- reducedDim(spe_sub, reduced_name)
             colnames(red_dims) <-
                 paste(reduced_name, "dim", seq_len(ncol(red_dims)))
             d <- cbind(d, red_dims)
@@ -640,21 +761,10 @@ app_server <- function(input, output, session) {
             sampleid = sampleid,
             colors = get_colors(colors, d[, clustervar]),
             spatial = FALSE,
-            title = paste(
-                sampleid,
-                clustervar,
-                geneid,
-                if (!geneid %in% colnames(colData(spe))) {
-                    assayname
-                } else {
-                    NULL
-                },
-                "min >",
-                minCount
-            ),
+            title = plot_title,
             image_id = input$imageid,
             alpha = input$alphalevel,
-            point_size = input$pointsize,
+            point_size = point_size,
             auto_crop = input$auto_crop
         )
 
@@ -668,11 +778,11 @@ app_server <- function(input, output, session) {
             cont_colors = cont_colors(),
             image_id = input$imageid,
             alpha = input$alphalevel,
-            point_size = input$pointsize,
+            point_size = point_size,
             auto_crop = input$auto_crop
         ) + geom_point(
             shape = 21,
-            size = input$pointsize,
+            size = point_size,
             stroke = 0,
             alpha = input$alphalevel
         )
@@ -690,7 +800,7 @@ app_server <- function(input, output, session) {
             ) +
                 geom_point(
                     shape = 21,
-                    size = input$pointsize,
+                    size = point_size,
                     stroke = 0
                 ) +
                 scale_fill_manual(values = get_colors(colors, colData(spe)[[clustervar]][spe$sample_id == sampleid])) +
@@ -718,7 +828,7 @@ app_server <- function(input, output, session) {
             ) +
                 geom_point(
                     shape = 21,
-                    size = input$pointsize,
+                    size = point_size,
                     stroke = 0
                 )
         } else {
@@ -774,7 +884,7 @@ app_server <- function(input, output, session) {
                     opacity = 0.8
                 )
             ),
-            dragmode = "select"
+            dragmode = "lasso"
         )
 
         plotly_gene <- layout(
@@ -799,7 +909,7 @@ app_server <- function(input, output, session) {
                     opacity = 0.8
                 )
             ),
-            dragmode = "select"
+            dragmode = "lasso"
         )
 
         plotly_dim <-
@@ -900,17 +1010,12 @@ app_server <- function(input, output, session) {
             return(NULL)
         }
 
-        gene_selected <- ifelse(
-            input$geneid %in% rowData(spe)$gene_search,
-            which(rowData(spe)$gene_search == input$geneid),
-            1
-        )
-
         p <-
             vis_gene(
-                spe[gene_selected, cluster_opts],
+                spe[, cluster_opts],
                 sampleid = input$sample,
                 geneid = input$geneid,
+                multi_gene_method = input$multi_gene_method,
                 assayname = input$assayname,
                 minCount = input$minCount,
                 spatial = FALSE,
@@ -918,7 +1023,8 @@ app_server <- function(input, output, session) {
                 image_id = input$imageid,
                 alpha = input$alphalevel,
                 point_size = input$pointsize,
-                auto_crop = input$auto_crop
+                auto_crop = input$auto_crop,
+                is_stitched = is_stitched
             ) +
             geom_point(
                 shape = 21,
@@ -926,6 +1032,9 @@ app_server <- function(input, output, session) {
                 stroke = 0,
                 alpha = input$alphalevel
             )
+
+        ## Update the reactiveValues data
+        rv$ContCount <- p$data[, c("key", "COUNT")]
 
         ## Read in the histology image
         img <-
@@ -968,7 +1077,7 @@ app_server <- function(input, output, session) {
                         opacity = 0.8
                     )
                 ),
-                dragmode = "select"
+                dragmode = "lasso"
             )
         )))
     })
@@ -1016,25 +1125,9 @@ app_server <- function(input, output, session) {
             event.data <- NULL
         }
         if (!is.null(event.data)) {
-            ## Prepare the data
-            d <-
-                as.data.frame(
-                    cbind(
-                        colData(spe),
-                        SpatialExperiment::spatialCoords(spe)
-                    )[spe$key %in% event.data$key, ],
-                    optional = TRUE
-                )
-            if (input$geneid %in% colnames(d)) {
-                d$COUNT <- d[[input$geneid]]
-            } else {
-                d$COUNT <-
-                    assays(spe)[[input$assayname]][which(rowData(spe)$gene_search == input$geneid), spe$key %in% event.data$key]
-            }
-            d$COUNT[d$COUNT <= input$minCount] <- NA
-
             isolate({
                 ## Now update with the ManualAnnotation input
+                d <- subset(rv$ContCount, key %in% event.data$key)
                 rv$ManualAnnotation[spe$key %in% d$key[!is.na(d$COUNT)]] <-
                     input$label_manual_ann_gene
             })
@@ -1043,7 +1136,7 @@ app_server <- function(input, output, session) {
 
     output$click_gene <- renderPrint({
         if (!is.null(input$gene_plotly_cluster_subset)) {
-            event.data <- event_data("plotly_click", source = "plotly_gene")
+            event.data <- event_data("plotly_click", source = "plotly_gene", priority = "event")
         } else {
             event.data <- NULL
         }
@@ -1051,32 +1144,15 @@ app_server <- function(input, output, session) {
             return(
                 "Single points clicked and updated with a manual annotation appear here (double-click to clear)"
             )
-        } else {
-            ## Prepare the data
-            d <-
-                as.data.frame(
-                    cbind(
-                        colData(spe),
-                        SpatialExperiment::spatialCoords(spe)
-                    )[spe$key %in% event.data$key, ],
-                    optional = TRUE
-                )
-            if (input$geneid %in% colnames(d)) {
-                d$COUNT <- d[[input$geneid]]
-            } else {
-                d$COUNT <-
-                    assays(spe)[[input$assayname]][which(rowData(spe)$gene_search == input$geneid), spe$key %in% event.data$key]
-            }
-            d$COUNT[d$COUNT <= input$minCount] <- NA
-
+        } else if (input$label_click_gene) {
             isolate({
                 ## Now update with the ManualAnnotation input
-                if (input$label_click_gene) {
-                    rv$ManualAnnotation[spe$key %in% d$key[!is.na(d$COUNT)]] <-
-                        input$label_manual_ann_gene
-                }
+                d <- subset(rv$ContCount, key %in% event.data$key)
+                rv$ManualAnnotation[spe$key %in% d$key[!is.na(d$COUNT)]] <-
+                    input$label_manual_ann_gene
+
+                return(event.data$key)
             })
-            return(event.data$key)
         }
     })
 
@@ -1392,10 +1468,29 @@ app_server <- function(input, output, session) {
         layer_stat_cor(input_stat, modeling_results, input$layer_model)
     })
 
+    static_layer_external_tstat_annotated_clusters <- reactive({
+        annotate_registered_clusters(
+            static_layer_external_tstat(),
+            input$layer_confidence_threshold,
+            input$layer_cutoff_merge_ratio
+        )
+    })
+
     static_layer_external_tstat_plot <- reactive({
         layer_stat_cor_plot(
             static_layer_external_tstat(),
-            max(c(0.1, input$layer_tstat_max))
+            max(c(0.1, input$layer_tstat_max)),
+            -max(c(0.1, input$layer_tstat_max)),
+            cluster_rows = FALSE,
+            cluster_columns = FALSE,
+            annotation = static_layer_external_tstat_annotated_clusters(),
+            query_colors = get_colors(
+                clusters = rownames(static_layer_external_tstat())
+            ),
+            reference_colors = get_colors(
+                spatialLIBD::libd_layer_colors,
+                clusters = colnames(static_layer_external_tstat())
+            )
         )
     })
 
@@ -1563,10 +1658,8 @@ app_server <- function(input, output, session) {
                 height = 8,
                 width = 12
             )
-            layer_stat_cor_plot(
-                static_layer_external_tstat(),
-                max(c(0.1, input$layer_tstat_max))
-            )
+            p <- static_layer_external_tstat_plot()
+            print(p)
             dev.off()
         }
     )
@@ -1785,6 +1878,30 @@ app_server <- function(input, output, session) {
         content = function(file) {
             write.csv(
                 static_layer_external_tstat(),
+                file = file,
+                quote = FALSE,
+                row.names = TRUE
+            )
+        }
+    )
+
+    output$layer_downloadTstatCor_annotation <- downloadHandler(
+        filename = function() {
+            gsub(
+                " ",
+                "_",
+                paste0(
+                    "spatialLIBD_layer_TstatCor_annotated_clusters_",
+                    input$layer_model,
+                    "_",
+                    Sys.time(),
+                    ".csv"
+                )
+            )
+        },
+        content = function(file) {
+            write.csv(
+                static_layer_external_tstat_annotated_clusters(),
                 file = file,
                 quote = FALSE,
                 row.names = TRUE

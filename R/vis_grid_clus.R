@@ -62,6 +62,8 @@ vis_grid_clus <-
         sample_order = unique(spe$sample_id),
         point_size = 2,
         auto_crop = TRUE,
+        na_color = "#CCCCCC40",
+        is_stitched = FALSE,
         ...) {
         stopifnot(all(sample_order %in% unique(spe$sample_id)))
 
@@ -80,6 +82,8 @@ vis_grid_clus <-
                     alpha = alpha,
                     point_size = point_size,
                     auto_crop = auto_crop,
+                    na_color = na_color,
+                    is_stitched = is_stitched,
                     ...
                 )
             })
@@ -87,7 +91,7 @@ vis_grid_clus <-
 
 
         if (!return_plots) {
-            pdf(pdf_file, height = 24, width = 36)
+            pdf(pdf_file, height = height, width = width)
             print(cowplot::plot_grid(plotlist = plots))
             dev.off()
             return(pdf_file)

@@ -21,13 +21,20 @@
 #'     head(spe$key)
 #'
 #'     ## We can clean it
+#'     spe$key_original <- spe$key
 #'     spe$key <- NULL
 #'
 #'     ## and then add it back
-#'     head(add_key(spe)$key)
+#'     spe <- add_key(spe)
+#'     head(spe$key)
 #'
 #'     ## Note that the original 'key' order was 'sample_id'_'barcode' and we'
 #'     ## have since changed it to 'barcode'_'sample_id'.
+#'
+#'     ## Below we restore the original 'key'
+#'     spe$key <- spe$key_original
+#'     spe$key_original <- NULL
+#'     head(spe$key)
 #' }
 add_key <- function(spe, overwrite = TRUE) {
     if ("key" %in% colnames(colData(spe))) {
@@ -35,14 +42,17 @@ add_key <- function(spe, overwrite = TRUE) {
             message(
                 "Overwriting 'spe$key'. Set 'overwrite = FALSE' if you do not want to overwrite it."
             )
-        } else {
-            stop(
-                "'spe$key' already exists. Set 'overwrite = TRUE' if you want to replace it.",
+            spe$key <- paste0(colnames(spe), "_", spe$sample_id)
+            stopifnot(!any(duplicated(spe$key)))
+        } else if (any(duplicated(spe$key))) {
+            warning(
+                "'spe$key' already exists and is not unique. Set 'overwrite = TRUE' to replace 'spe$key' with unique values.",
                 call. = FALSE
             )
         }
+    } else {
+        spe$key <- paste0(colnames(spe), "_", spe$sample_id)
+        stopifnot(!any(duplicated(spe$key)))
     }
-    spe$key <- paste0(colnames(spe), "_", spe$sample_id)
-    stopifnot(!any(duplicated(spe$key)))
     return(spe)
 }

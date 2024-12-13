@@ -23,7 +23,9 @@ object or one that inherits its properties.}
 
 \item{var_registration}{A \code{character(1)} specifying the \code{colData(sce)}
 variable of interest against which will be used for computing the relevant
-statistics.}
+statistics. This should be a categorical variable, with all categories
+syntaticly valid (could be used as an R variable, no special characters or
+leading numbers), ex. 'L1.2', 'celltype2' not 'L1/2' or '2'.}
 
 \item{var_sample_id}{A \code{character(1)} specifying the \code{colData(sce)} variable
 with the sample ID.}
@@ -92,8 +94,19 @@ rowData(sce)$gene_name <- paste0("gene", seq_len(nrow(sce)))
 ## Compute all modeling results
 example_modeling_results <- registration_wrapper(
     sce,
-    "Cell_Cycle", "sample_id", c("age"), "ensembl", "gene_name", "wrapper"
+    var_registration = "Cell_Cycle",
+    var_sample_id = "sample_id",
+    covars = c("age"),
+    gene_ensembl = "ensembl",
+    gene_name = "gene_name",
+    suffix = "wrapper"
 )
+
+## Explore the results from registration_wrapper()
+class(example_modeling_results)
+length(example_modeling_results)
+names(example_modeling_results)
+lapply(example_modeling_results, head)
 }
 \seealso{
 Other spatial registration and statistical modeling functions: 

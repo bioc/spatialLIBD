@@ -13,20 +13,26 @@ layer_stat_cor(
 )
 }
 \arguments{
-\item{stats}{A data.frame where the row names are Ensembl gene IDs, the
-column names are labels for clusters of cells or cell types, and where
+\item{stats}{A query \code{data.frame} where the row names are ENSEMBL gene IDs,
+the column names are labels for clusters of cells or cell types, and where
 each cell contains the given statistic for that gene and cell type. These
 statistics should be computed similarly to the modeling results from
 the data we provide. For example, like the \code{enrichment} t-statistics that
 are derived from comparing one layer against the rest. The \code{stats} will be
-matched and then correlated with our statistics.}
+matched and then correlated with the reference statistics.
+
+If using the output of \code{registration_wrapper()} then use \verb{$enrichment} to
+access the results from \code{registration_stats_enrichment()}. This function will
+automatically extract the statistics and assign the ENSEMBL gene IDs to the
+row names of the query matrix.}
 
 \item{modeling_results}{Defaults to the output of
 \code{fetch_data(type = 'modeling_results')}. This is a list of tables with the
 columns \verb{f_stat_*} or \verb{t_stat_*} as well as \verb{p_value_*} and \verb{fdr_*} plus
 \code{ensembl}. The column name is used to extract the statistic results, the
 p-values, and the FDR adjusted p-values. Then the \code{ensembl} column is used
-for matching in some cases. See \code{\link[=fetch_data]{fetch_data()}} for more details.}
+for matching in some cases. See \code{\link[=fetch_data]{fetch_data()}} for more details. Typically
+this is the set of reference statistics used in \code{layer_stat_cor()}.}
 
 \item{model_type}{A named element of the \code{modeling_results} list. By default
 that is either \code{enrichment} for the model that tests one human brain layer
@@ -45,9 +51,9 @@ into \code{layerB-layerA}.}
 genes. The default is \code{NULL} in which case no filtering is done.}
 }
 \value{
-A correlation matrix between \code{stats} and our statistics using only
-the Ensembl gene IDs present in both tables. The columns are sorted using
-a hierarchical cluster.
+A correlation matrix between the query \code{stats} and the reference
+statistics using only the ENSEMBL gene IDs present in both tables.
+The columns are sorted using hierarchical clustering.
 }
 \description{
 Layer modeling correlation of statistics

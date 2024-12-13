@@ -23,6 +23,8 @@ run_app(
   spe_continuous_vars = c("cell_count", "sum_umi", "sum_gene", "expr_chrM",
     "expr_chrM_ratio"),
   default_cluster = "spatialLIBD",
+  auto_crop_default = TRUE,
+  is_stitched = FALSE,
   ...
 )
 }
@@ -44,7 +46,8 @@ layer-level (group-level) resolution. See \code{\link[=fetch_data]{fetch_data()}
 columns \verb{f_stat_*} or \verb{t_stat_*} as well as \verb{p_value_*} and \verb{fdr_*} plus
 \code{ensembl}. The column name is used to extract the statistic results, the
 p-values, and the FDR adjusted p-values. Then the \code{ensembl} column is used
-for matching in some cases. See \code{\link[=fetch_data]{fetch_data()}} for more details.}
+for matching in some cases. See \code{\link[=fetch_data]{fetch_data()}} for more details. Typically
+this is the set of reference statistics used in \code{layer_stat_cor()}.}
 
 \item{sig_genes}{The output of \code{\link[=sig_genes_extract_all]{sig_genes_extract_all()}} which is a table
 in long format with the modeling results. You can subset this if the object
@@ -68,6 +71,18 @@ as genes. They will have to be present in \code{colData(sce)}.}
 \item{default_cluster}{A \code{character(1)} with the name of the main cluster
 (discrete) variable to use. It will have to be present in both \code{colData(spe)}
 and \code{colData(sce_layer)}.}
+
+\item{auto_crop_default}{A \code{logical(1)} specifying the default value for
+automatically cropping the images. Set this to \code{FALSE} if your images do not
+follow the Visium grid size expectations, which are key for enabling
+auto-cropping.}
+
+\item{is_stitched}{A \code{logical(1)} vector: If \code{TRUE}, expects a
+\link[SpatialExperiment:SpatialExperiment]{SpatialExperiment-class} built
+with \code{visiumStitched::build_spe()}.
+\url{http://research.libd.org/visiumStitched/reference/build_spe.html}; in
+particular, expects a logical colData column \code{exclude_overlapping}
+specifying which spots to exclude from the plot. Sets \code{auto_crop = FALSE}.}
 
 \item{...}{Other arguments passed to the list of golem options for running
 the application.}
@@ -227,5 +242,27 @@ if (enough_ram(9e9)) {
 ## * https://github.com/LieberInstitute/spatialDLPFC/tree/main/code/deploy_app_k09_position_noWM
 ## * https://github.com/LieberInstitute/spatialDLPFC/tree/main/code/deploy_app_k16
 ## * https://github.com/LieberInstitute/spatialDLPFC/tree/main/code/analysis_IF/03_spatialLIBD_app
+
+
+## Example for an object with multiple capture areas stitched together with
+## <http://research.libd.org/visiumStitched/>.
+spe_stitched <- fetch_data("Visium_LS_spe")
+
+## Inspect this object
+spe_stitched
+
+## Notice the use of "exclude_overlapping"
+table(spe_stitched$exclude_overlapping, useNA = "ifany")
+
+## Run the app with this stitched data
+run_app(
+    spe = spe_stitched,
+    sce_layer = NULL, modeling_results = NULL, sig_genes = NULL,
+    title = "visiumStitched example data",
+    spe_discrete_vars = c("capture_area", "scran_quick_cluster", "ManualAnnotation"),
+    spe_continuous_vars = c("sum_umi", "sum_gene", "expr_chrM", "expr_chrM_ratio"),
+    default_cluster = "scran_quick_cluster",
+    is_stitched = TRUE
+)
 }
 }

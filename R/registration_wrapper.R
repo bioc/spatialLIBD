@@ -47,8 +47,19 @@
 #' ## Compute all modeling results
 #' example_modeling_results <- registration_wrapper(
 #'     sce,
-#'     "Cell_Cycle", "sample_id", c("age"), "ensembl", "gene_name", "wrapper"
+#'     var_registration = "Cell_Cycle",
+#'     var_sample_id = "sample_id",
+#'     covars = c("age"),
+#'     gene_ensembl = "ensembl",
+#'     gene_name = "gene_name",
+#'     suffix = "wrapper"
 #' )
+#'
+#' ## Explore the results from registration_wrapper()
+#' class(example_modeling_results)
+#' length(example_modeling_results)
+#' names(example_modeling_results)
+#' lapply(example_modeling_results, head)
 registration_wrapper <-
     function(
         sce,
@@ -60,8 +71,13 @@ registration_wrapper <-
         suffix = "",
         min_ncells = 10,
         pseudobulk_rds_file = NULL) {
+        ## Change the rownames to ENSEMBL IDs
+        rownames(sce) <- rowData(sce)[, gene_ensembl]
+
+        ## Pseudobulk
         sce_pseudo <-
-            registration_pseudobulk(sce,
+            registration_pseudobulk(
+                sce,
                 var_registration = var_registration,
                 var_sample_id = var_sample_id,
                 min_ncells = min_ncells,
@@ -74,6 +90,15 @@ registration_wrapper <-
         block_cor <-
             registration_block_cor(sce_pseudo, registration_model = registration_mod)
 
+        ## test if registration var has two groups
+        registration_var_k2 <- length(grep("^registration_variable", colnames(registration_mod))) == 2
+        if (registration_var_k2) {
+            warning(
+                "You need 'var_registration' to have at least 3 unique values to compute an F-statistic and thus ANOVA modeling results cannot be computed.",
+                call. = FALSE
+            )
+        }
+
         results_enrichment <-
             registration_stats_enrichment(
                 sce_pseudo,
@@ -82,6 +107,7 @@ registration_wrapper <-
                 gene_ensembl = gene_ensembl,
                 gene_name = gene_name
             )
+
         results_pairwise <-
             registration_stats_pairwise(
                 sce_pseudo,
@@ -90,21 +116,27 @@ registration_wrapper <-
                 gene_ensembl = gene_ensembl,
                 gene_name = gene_name
             )
-        results_anova <-
-            registration_stats_anova(
-                sce_pseudo,
-                block_cor = block_cor,
-                covars = covars,
-                gene_ensembl = gene_ensembl,
-                gene_name = gene_name,
-                suffix = suffix
-            )
 
+        ## with more than 2 groups run ANOVA model
+        if (!registration_var_k2) {
+            results_anova <-
+                registration_stats_anova(
+                    sce_pseudo,
+                    block_cor = block_cor,
+                    covars = covars,
+                    gene_ensembl = gene_ensembl,
+                    gene_name = gene_name,
+                    suffix = suffix
+                )
+        } else {
+            results_anova <- NULL
+        }
+
+        ## Bundle results together
         modeling_results <- list(
-            "anova" = results_anova,
+            "anova" = NULL,
             "enrichment" = results_enrichment,
             "pairwise" = results_pairwise
         )
-
         return(modeling_results)
     }

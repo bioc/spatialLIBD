@@ -19,23 +19,27 @@ vis_gene(
   point_size = 2,
   auto_crop = TRUE,
   na_color = "#CCCCCC40",
+  multi_gene_method = c("z_score", "pca", "sparsity"),
+  is_stitched = FALSE,
   ...
 )
 }
 \arguments{
-\item{spe}{Defaults to the output of
-\code{fetch_data(type = 'spe')}. This is a
+\item{spe}{A
 \link[SpatialExperiment:SpatialExperiment]{SpatialExperiment-class}
-object with the spot-level Visium data and information required for
-visualizing the histology. See \code{\link[=fetch_data]{fetch_data()}} for more details.}
+object. See \code{\link[=fetch_data]{fetch_data()}} for how to download some example objects or
+\code{\link[=read10xVisiumWrapper]{read10xVisiumWrapper()}} to read in \code{spaceranger --count} output files and
+build your own \code{spe} object.}
 
 \item{sampleid}{A \code{character(1)} specifying which sample to plot from
 \code{colData(spe)$sample_id} (formerly \code{colData(spe)$sample_name}).}
 
-\item{geneid}{A \code{character(1)} specifying the gene ID stored in
-\code{rowData(spe)$gene_search} or a continuous variable stored in \code{colData(spe)}
-to visualize. If \code{rowData(spe)$gene_search} is missing, then \code{rownames(spe)}
-is used to search for the gene ID.}
+\item{geneid}{A \code{character()} specifying the gene ID(s) stored in
+\code{rowData(spe)$gene_search} or a continuous variable(s) stored in
+\code{colData(spe)} to visualize. For each ID, if \code{rowData(spe)$gene_search} is
+missing, then \code{rownames(spe)} is used to search for the gene ID. When a
+vector of length > 1 is supplied, the continuous variables are combined
+according to \code{multi_gene_method}, producing a single value for each spot.}
 
 \item{spatial}{A \code{logical(1)} indicating whether to include the histology
 layer from \code{\link[=geom_spatial]{geom_spatial()}}. If you plan to use
@@ -76,6 +80,25 @@ If you set \code{alpha = NA} then it's best to set \code{na_color} to a color th
 alpha blending already, which will make non-NA values pop up more and the NA
 values will show with a lighter color. This behavior is lost when \code{alpha} is
 set to a non-\code{NA} value.}
+
+\item{multi_gene_method}{A \code{character(1)}: either \code{"pca"}, \code{"sparsity"}, or
+\code{"z_score"}. This parameter controls how multiple continuous variables are
+combined for visualization, and only applies when \code{geneid} has length
+great than 1. \code{z_score}: to summarize multiple continuous variables, each is
+normalized to represent a Z-score. The multiple scores are then averaged.
+\code{pca}: PCA dimension reduction is conducted on the matrix formed by the
+continuous variables, and the first PC is then used and multiplied by -1 if
+needed to have the majority of the values for PC1 to be positive. \code{sparsity}:
+the proportion of continuous variables with positive values for each spot is
+computed. For more details, check the multi gene vignette at
+\url{https://research.libd.org/spatialLIBD/articles/multi_gene_plots.html}.}
+
+\item{is_stitched}{A \code{logical(1)} vector: If \code{TRUE}, expects a
+\link[SpatialExperiment:SpatialExperiment]{SpatialExperiment-class} built
+with \code{visiumStitched::build_spe()}.
+\url{http://research.libd.org/visiumStitched/reference/build_spe.html}; in
+particular, expects a logical colData column \code{exclude_overlapping}
+specifying which spots to exclude from the plot. Sets \code{auto_crop = FALSE}.}
 
 \item{...}{Passed to \link[base:paste]{paste0()} for making the title of the
 plot following the \code{sampleid}.}
@@ -167,6 +190,42 @@ if (enough_ram()) {
         auto_crop = FALSE
     )
     print(p5)
+
+    #    Define several markers for white matter
+    white_matter_genes <- c(
+        "ENSG00000197971", "ENSG00000131095", "ENSG00000123560",
+        "ENSG00000171885"
+    )
+
+    ## Plot all white matter markers at once using the Z-score combination
+    ## method
+    p6 <- vis_gene(
+        spe = spe,
+        sampleid = "151507",
+        geneid = white_matter_genes,
+        multi_gene_method = "z_score"
+    )
+    print(p6)
+
+    ## Plot all white matter markers at once using the sparsity combination
+    ## method
+    p7 <- vis_gene(
+        spe = spe,
+        sampleid = "151507",
+        geneid = white_matter_genes,
+        multi_gene_method = "sparsity"
+    )
+    print(p7)
+
+    ## Plot all white matter markers at once using the PCA combination
+    ## method
+    p8 <- vis_gene(
+        spe = spe,
+        sampleid = "151507",
+        geneid = white_matter_genes,
+        multi_gene_method = "pca"
+    )
+    print(p8)
 }
 }
 \seealso{

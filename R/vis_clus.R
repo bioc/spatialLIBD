@@ -4,7 +4,11 @@
 #' using (by default) the histology information on the background. To visualize
 #' gene-level (or any continuous variable) use [vis_gene()].
 #'
-#' @inheritParams run_app
+#' @param spe A
+#' [SpatialExperiment-class][SpatialExperiment::SpatialExperiment-class]
+#' object. See [fetch_data()] for how to download some example objects or
+#' [read10xVisiumWrapper()] to read in `spaceranger --count` output files and
+#' build your own `spe` object.
 #' @param sampleid A `character(1)` specifying which sample to plot from
 #' `colData(spe)$sample_id` (formerly `colData(spe)$sample_name`).
 #' @param clustervar A `character(1)` with the name of the `colData(spe)`
@@ -24,6 +28,17 @@
 #' @param auto_crop A `logical(1)` indicating whether to automatically crop
 #' the image / plotting area, which is useful if the Visium capture area is
 #' not centered on the image and if the image is not a square.
+#' @param na_color A `character(1)` specifying a color for the NA values.
+#' If you set `alpha = NA` then it's best to set `na_color` to a color that has
+#' alpha blending already, which will make non-NA values pop up more and the NA
+#' values will show with a lighter color. This behavior is lost when `alpha` is
+#' set to a non-`NA` value.
+#' @param is_stitched A \code{logical(1)} vector: If `TRUE`, expects a
+#' [SpatialExperiment-class][SpatialExperiment::SpatialExperiment-class] built
+#' with `visiumStitched::build_spe()`.
+#' <http://research.libd.org/visiumStitched/reference/build_spe.html>; in
+#' particular, expects a logical colData column `exclude_overlapping`
+#' specifying which spots to exclude from the plot. Sets `auto_crop = FALSE`.
 #' @param ... Passed to [paste0()][base::paste] for making the title of the
 #' plot following the `sampleid`.
 #'
@@ -74,6 +89,19 @@
 #'         spatial = FALSE
 #'     )
 #'     print(p3)
+#'
+#'     ## With some NA values
+#'     spe$tmp <- spe$layer_guess_reordered
+#'     spe$tmp[spe$sample_id == "151673"][seq_len(500)] <- NA
+#'     p4 <- vis_clus(
+#'         spe = spe,
+#'         clustervar = "tmp",
+#'         sampleid = "151673",
+#'         colors = libd_layer_colors,
+#'         na_color = "white",
+#'         ... = " LIBD Layers"
+#'     )
+#'     print(p4)
 #' }
 vis_clus <- function(
         spe,
@@ -98,8 +126,42 @@ vis_clus <- function(
         alpha = NA,
         point_size = 2,
         auto_crop = TRUE,
+        na_color = "#CCCCCC40",
+        is_stitched = FALSE,
         ...) {
+    #   Verify existence and legitimacy of 'sampleid'
+    if (
+        !("sample_id" %in% colnames(colData(spe))) ||
+            !(sampleid %in% spe$sample_id)
+    ) {
+        stop(
+            paste(
+                "'spe$sample_id' must exist and contain the ID", sampleid
+            ),
+            call. = FALSE
+        )
+    }
+
+    #   Check validity of spatial coordinates
+    if (!setequal(c("pxl_col_in_fullres", "pxl_row_in_fullres"), colnames(spatialCoords(spe)))) {
+        stop(
+            "Abnormal spatial coordinates: should have 'pxl_row_in_fullres' and 'pxl_col_in_fullres' columns.",
+            call. = FALSE
+        )
+    }
+
     spe_sub <- spe[, spe$sample_id == sampleid]
+
+    if (is_stitched) {
+        #   Drop excluded spots and calculate an appropriate point size
+        temp <- prep_stitched_data(spe_sub, point_size, image_id)
+        spe_sub <- temp$spe
+        point_size <- temp$point_size
+
+        #   Frame limits are poorly defined for stitched data
+        auto_crop <- FALSE
+    }
+
     d <- as.data.frame(cbind(colData(spe_sub), SpatialExperiment::spatialCoords(spe_sub)), optional = TRUE)
 
     vis_clus_p(
@@ -113,6 +175,7 @@ vis_clus <- function(
         image_id = image_id,
         alpha = alpha,
         point_size = point_size,
-        auto_crop = auto_crop
+        auto_crop = auto_crop,
+        na_color = na_color
     )
 }

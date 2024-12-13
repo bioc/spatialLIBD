@@ -2,56 +2,70 @@
 % Please edit documentation in R/gene_set_enrichment_plot.R
 \name{gene_set_enrichment_plot}
 \alias{gene_set_enrichment_plot}
-\title{Plot the gene set enrichment results}
+\title{Plot the gene set enrichment results with ComplexHeatmap}
 \usage{
 gene_set_enrichment_plot(
   enrichment,
   PThresh = 12,
   ORcut = 3,
   enrichOnly = FALSE,
-  gene_count_col = NULL,
-  gene_count_row = NULL,
-  anno_title_col = NULL,
-  anno_title_row = NULL,
-  column_order = NULL,
-  anno_add = NULL,
-  mypal = c("white", (grDevices::colorRampPalette(RColorBrewer::brewer.pal(9,
-    "YlOrRd")))(50))
+  mypal = c("white", RColorBrewer::brewer.pal(9, "YlOrRd")),
+  plot_SetSize_bar = FALSE,
+  gene_list_length = NULL,
+  model_sig_length = NULL,
+  model_colors = NULL,
+  ...
 )
 }
 \arguments{
-\item{enrichment}{The output of \code{\link[=gene_set_enrichment]{gene_set_enrichment()}}.
-\code{unique(enrichment$ID)}. Gets passed to \code{\link[=layer_matrix_plot]{layer_matrix_plot()}}.}
+\item{enrichment}{The output of \code{\link[=gene_set_enrichment]{gene_set_enrichment()}}.}
+
+\item{xlabs}{A vector of names in the same order and length as
+\code{unique(enrichment$ID)}.}
 
 \item{PThresh}{A \code{numeric(1)} specifying the P-value threshold for the
 maximum value in the \code{-log10(p)} scale.}
 
 \item{ORcut}{A \code{numeric(1)} specifying the P-value threshold for the
 minimum value in the \code{-log10(p)} scale for printing the odds ratio values
-in the cells of the resulting plot.}
+in the cells of the resulting plot. Defaults to 3 or p-val < 0.001.}
 
 \item{enrichOnly}{A \code{logical(1)} indicating whether to show only odds ratio
 values greater than 1.}
 
-\item{mypal}{A vector with the color palette to use. Gets passed to
-\code{\link[=layer_matrix_plot]{layer_matrix_plot()}}.}
+\item{mypal}{A \code{character} vector with the color palette to use. Colors will
+be in order from 0 to lowest P-val \code{max(-log(enrichment$Pval))}. Defaults to
+white, yellow, red pallet.}
 
-\item{layerHeights}{A \code{numeric()} vector of length equal to
-\code{length(unique(enrichment$test)) + 1} that starts at 0 specifying where
-to plot the y-axis breaks which can be used for re-creating the length of
-each brain layer. Gets passed to \code{\link[=layer_matrix_plot]{layer_matrix_plot()}}.}
+\item{plot_SetSize_bar}{A \code{logical(1)} indicating whether to plot SetSize
+from \code{enrichment} as an \code{anno_barplot} at the top of the heatmap.}
 
-\item{cex}{Passed to \code{\link[=layer_matrix_plot]{layer_matrix_plot()}}.}
+\item{gene_list_length}{Optional named \code{numeric} vector indicating the length
+of the \code{gene_list} used to calculate \code{enrichment}, if inclided and
+\code{plot_setSize_bar = TRUE} then the top \code{anno_barplot} will show the \code{SetSize}
+and the difference from the length of the input gene_list.
+#' @param model_sig_length Optional named \code{numeric} vector indicating the
+number of significant genes in \code{modeling_results} used to calculate
+\code{enrichment}. If included \code{anno_barplot} will be added to rows.
+#' @param model_colors named \code{character} vector of colors, Adds colors to
+row annotations.
+#' @param ... Additional parameters passed to
+\code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}.}
 }
 \value{
-A plot visualizing the gene set enrichment
-odds ratio and p-value results.
+A (\link[ComplexHeatmap:Heatmap-class]{Heatmap-class}) visualizing the
+gene set enrichment odds ratio and p-value results.
 }
 \description{
 This function takes the output of \code{\link[=gene_set_enrichment]{gene_set_enrichment()}} and creates a
-heatmap visualization of the results.
+ComplexHeatmap visualization of the results. Fill of the heatmap represents
+the -log10(p-val), Odds-ratios are printed for test that pass specified
+significance threshold \code{ORcut}.
 }
 \details{
+Includes functionality to plot the size of the input gene sets as barplot
+annotations.
+
 Check
 https://github.com/LieberInstitute/HumanPilot/blob/master/Analysis/Layer_Guesses/check_clinical_gene_sets.R
 to see a full script from where this family of functions is derived from.
@@ -69,7 +83,7 @@ asd_sfari <- utils::read.csv(
 )
 
 ## Format them appropriately
-asd_sfari_geneList <- list(
+asd_safari_geneList <- list(
     Gene_SFARI_all = asd_sfari$ensembl.id,
     Gene_SFARI_high = asd_sfari$ensembl.id[asd_sfari$gene.score < 3],
     Gene_SFARI_syndromic = asd_sfari$ensembl.id[asd_sfari$syndromic == 1]
@@ -82,30 +96,79 @@ if (!exists("modeling_results")) {
 
 ## Compute the gene set enrichment results
 asd_sfari_enrichment <- gene_set_enrichment(
-    gene_list = asd_sfari_geneList,
+    gene_list = asd_safari_geneList,
     modeling_results = modeling_results,
     model_type = "enrichment"
 )
 
 ## Visualize the gene set enrichment results
-## with a custom color palette
+
+## Default plot
+gene_set_enrichment_plot(
+    enrichment = asd_sfari_enrichment
+)
+
+## Use a custom green color palette & use shorter gene set names (x-axis labels)
 gene_set_enrichment_plot(
     asd_sfari_enrichment,
     xlabs = gsub(".*_", "", unique(asd_sfari_enrichment$ID)),
-    mypal = c(
-        "white",
-        grDevices::colorRampPalette(
-            RColorBrewer::brewer.pal(9, "BuGn")
-        )(50)
-    )
+    mypal = c("white",RColorBrewer::brewer.pal(9, "BuGn"))
+)
+
+## Add bar plot annotations for SetSize of model genes in the gene_lists
+gene_set_enrichment_plot(
+    asd_sfari_enrichment,
+    xlabs = gsub(".*_", "", unique(asd_sfari_enrichment$ID)),
+    plot_SetSize_bar = TRUE
+)
+
+## Add stacked bar plot annotations showing SetSize and difference from the
+## length of the input gene_list
+gene_set_enrichment_plot(
+    asd_sfari_enrichment,
+    xlabs = gsub(".*_", "", unique(asd_sfari_enrichment$ID)),
+    plot_SetSize_bar = TRUE,
+    gene_list_length = lapply(asd_safari_geneList, length)
 )
 layer_gene_count <- get_gene_enrichment_count(model_results = modeling_results)
 
+## add bar plot annotations for number of enriched genes from layers
+if (!exists("sce_layer")) sce_layer <- fetch_data(type = "sce_layer")
+sig_genes <- sig_genes_extract(
+    modeling_results = modeling_results,
+    model = "enrichment",
+    sce_layer = sce_layer,
+    n = nrow(sce_layer)
+)
+
+sig_genes <- sig_genes[sig_genes$fdr < 0.1,]
+n_sig_model <- as.list(table(sig_genes$test))
+
+## add barplot with n significant genes from modeling
 gene_set_enrichment_plot(
     asd_sfari_enrichment,
-    gene_count_col = sfari_gene_count,
-    gene_count_row = layer_gene_count
+    xlabs = gsub(".*_", "", unique(asd_sfari_enrichment$ID)),
+    plot_SetSize_bar = TRUE,
+    model_sig_length = n_sig_model
 )
+
+## add color annotaions
+gene_set_enrichment_plot(
+    asd_sfari_enrichment,
+    xlabs = gsub(".*_", "", unique(asd_sfari_enrichment$ID)),
+    plot_SetSize_bar = TRUE,
+    model_colors = libd_layer_colors
+)
+
+## add barplot with n significant genes from modeling filled with model color
+gene_set_enrichment_plot(
+    asd_sfari_enrichment,
+    xlabs = gsub(".*_", "", unique(asd_sfari_enrichment$ID)),
+    plot_SetSize_bar = TRUE,
+    model_sig_length = n_sig_model,
+    model_colors = libd_layer_colors
+)
+
 }
 \seealso{
 layer_matrix_plot

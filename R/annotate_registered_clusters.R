@@ -48,23 +48,15 @@
 #' ## More relaxed merging threshold
 #' annotate_registered_clusters(cor_stats_layer, cutoff_merge_ratio = 1)
 annotate_registered_clusters <-
-    function(
-        cor_stats_layer,
-        confidence_threshold = 0.25,
-        cutoff_merge_ratio = 0.25) {
+    function(cor_stats_layer,
+    confidence_threshold = 0.25,
+    cutoff_merge_ratio = 0.25) {
         annotated <-
             apply(cor_stats_layer,
                 1,
                 annotate_registered_cluster,
                 cutoff_merge_ratio = cutoff_merge_ratio
             )
-
-        if (all(colnames(cor_stats_layer) %in% c("WM", paste0("Layer", seq_len(6))))) {
-            ## Simplify names when working with the default data
-            annotated <- gsub("ayer", "", annotated)
-            annotated <- gsub("\\/L", "\\/", annotated)
-            annotated <- gsub("^WM\\/", "WM\\/L", annotated)
-        }
 
         confidence <- apply(cor_stats_layer, 1, max) > confidence_threshold
 
@@ -83,15 +75,24 @@ annotate_registered_clusters <-
                 result$layer_label,
                 ifelse(result$layer_confidence == "good", "", "*")
             )
+
+        ## Add simplified label for WM/Layer annotations
+        if (all(colnames(cor_stats_layer) %in% c("WM", paste0("Layer", seq_len(6))))) {
+            result$layer_label_simple <- result$layer_label
+            ## Simplify names when working with the default data
+            result$layer_label_simple <- gsub("ayer", "", result$layer_label_simple)
+            result$layer_label_simple <- gsub("\\/L", "\\/", result$layer_label_simple)
+            result$layer_label_simple <- gsub("^WM\\/", "WM\\/L", result$layer_label_simple)
+        }
+
         return(result)
     }
 
 annotate_registered_cluster <-
-    function(
-        remaining,
-        label = "",
-        current = NULL,
-        cutoff_merge_ratio = 0.25) {
+    function(remaining,
+    label = "",
+    current = NULL,
+    cutoff_merge_ratio = 0.25) {
         ## Filter negative correlations
         remaining <- remaining[remaining > 0]
 
