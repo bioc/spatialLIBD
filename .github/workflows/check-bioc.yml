@@ -53,7 +53,7 @@ jobs:
       matrix:
         config:
           - { os: ubuntu-latest, r: '4.4', bioc: '3.20', cont: "bioconductor/bioconductor_docker:RELEASE_3_20", rspm: "https://packagemanager.rstudio.com/cran/__linux__/jammy/latest" }
-          # - { os: macOS-latest, r: '4.4', bioc: '3.20'}
+          - { os: macOS-latest, r: '4.4', bioc: '3.20'}
           - { os: windows-latest, r: '4.4', bioc: '3.20'}
           ## Check https://github.com/r-lib/actions/tree/master/examples
           ## for examples using the http-user-agent
@@ -142,6 +142,17 @@ jobs:
 
           ## Required for tcltk
           brew install xquartz --cask
+
+          ## Latest curl
+          brew install curl pkg-config
+
+      - name: Install macOS curl from source
+        if: matrix.config.os == 'macOS-latest'
+        run: |
+          message(paste('****', Sys.time(), 'installing curl from source ****'))
+          Sys.setenv(PKG_CONFIG_PATH="/opt/homebrew/opt/curl/lib/pkgconfig:/usr/local/opt/curl/lib/pkgconfig")
+          install.packages("curl", type = "source")
+        shell: Rscript {0}
 
       - name: Install Windows system dependencies
         if: runner.os == 'Windows'
