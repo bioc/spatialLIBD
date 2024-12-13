@@ -6,6 +6,7 @@
 \usage{
 gene_set_enrichment_plot(
   enrichment,
+  xlabs = unique(enrichment$ID),
   PThresh = 12,
   ORcut = 3,
   enrichOnly = FALSE,
@@ -108,7 +109,8 @@ gene_set_enrichment_plot(
     enrichment = asd_sfari_enrichment
 )
 
-## Use a custom green color palette & use shorter gene set names (x-axis labels)
+## Use a custom green color palette & use shorter gene set names
+## (x-axis labels)
 gene_set_enrichment_plot(
     asd_sfari_enrichment,
     xlabs = gsub(".*_", "", unique(asd_sfari_enrichment$ID)),
@@ -130,7 +132,6 @@ gene_set_enrichment_plot(
     plot_SetSize_bar = TRUE,
     gene_list_length = lapply(asd_safari_geneList, length)
 )
-layer_gene_count <- get_gene_enrichment_count(model_results = modeling_results)
 
 ## add bar plot annotations for number of enriched genes from layers
 if (!exists("sce_layer")) sce_layer <- fetch_data(type = "sce_layer")
@@ -152,7 +153,7 @@ gene_set_enrichment_plot(
     model_sig_length = n_sig_model
 )
 
-## add color annotaions
+## add color annotations
 gene_set_enrichment_plot(
     asd_sfari_enrichment,
     xlabs = gsub(".*_", "", unique(asd_sfari_enrichment$ID)),

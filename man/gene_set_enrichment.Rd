@@ -43,6 +43,18 @@ into \code{layerB-layerA}.}
 \value{
 A table in long format with the enrichment results using
 \code{\link[stats:fisher.test]{stats::fisher.test()}}.
+\itemize{
+\item \code{OR} odds ratio.
+\item \code{Pval} p-value for \code{fisher.test()}.
+\item \code{test} group or layer in the \code{modeling_results}.
+\item \code{NumSig} Number of genes from the gene set present in \code{modeling_results} &
+with \code{fdr < fdr_cut} and \code{t_stat > 0} (unless reverse = TRUE) for \code{test} in
+modeling results.
+\item \code{SetSize} Number of genes from \code{modeling_results} present in \code{gene_set}.
+\item \code{ID} name of gene set.
+\item \code{model_type} record of input model type from \verb{modeling results}.
+\item \code{fdr_cut} record of input \code{frd_cut}.
+}
 }
 \description{
 Using the layer-level (group-level) data, this function evaluates whether
