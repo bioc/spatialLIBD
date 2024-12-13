@@ -43,8 +43,7 @@
 #' @importFrom ComplexHeatmap columnAnnotation rowAnnotation Heatmap anno_barplot
 #'
 #' @family Gene set enrichment functions
-#' @author Andrew E Jaffe, Leonardo Collado-Torres
-#' @seealso layer_matrix_plot
+#' @author Andrew E Jaffe, Leonardo Collado-Torres, Louise Huuki-Myers
 #' @details Check
 #' https://github.com/LieberInstitute/HumanPilot/blob/master/Analysis/Layer_Guesses/check_clinical_gene_sets.R
 #' to see a full script from where this family of functions is derived from.
