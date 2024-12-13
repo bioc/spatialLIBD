@@ -528,7 +528,11 @@ Using the above enrichment table, we can then visualize the odds ratios on a hea
 gene_set_enrichment_plot(
     asd_sfari_enrichment,
     xlabs = gsub(".*_", "", unique(asd_sfari_enrichment$ID)),
-    layerHeights = c(0, 40, 55, 75, 85, 110, 120, 135)
+    plot_SetSize_bar = TRUE,
+    model_colors = get_colors(
+        spatialLIBD::libd_layer_colors,
+        clusters = unique(asd_sfari_enrichment$test)
+    )
 )
 ```
 
