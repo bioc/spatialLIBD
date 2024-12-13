@@ -1,3 +1,14 @@
+# spatialLIBD 1.19.4
+
+NEW FEATURES
+
+* @lahuuki fully re-implemented `gene_set_enrichment_plot()` using
+`ComplexHeatmap::Heatmap()`. This new version has several new arguments that 
+allow adding more annotation to the resulting heatmap. See
+<https://github.com/LieberInstitute/spatialLIBD/pull/93> for more details. This
+also means that `layer_matrix_plot()` has been removed from the package since
+it previously served as a helper function for `gene_set_enrichment_plot()`.
+
 # spatialLIBD 1.19.3
 
 BUG FIXES
