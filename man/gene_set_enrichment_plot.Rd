@@ -172,12 +172,10 @@ gene_set_enrichment_plot(
 
 }
 \seealso{
-layer_matrix_plot
-
 Other Gene set enrichment functions: 
 \code{\link{gene_set_enrichment}()}
 }
 \author{
-Andrew E Jaffe, Leonardo Collado-Torres
+Andrew E Jaffe, Leonardo Collado-Torres, Louise Huuki-Myers
 }
 \concept{Gene set enrichment functions}
