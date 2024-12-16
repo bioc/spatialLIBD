@@ -1,3 +1,10 @@
+# spatialLIBD 1.19.5
+
+BUG FIXES
+
+* Fixed internal errors in `add_qc_metrics()` on the `scuttle::isOutlier()`
+function calls.
+
 # spatialLIBD 1.19.4
 
 NEW FEATURES

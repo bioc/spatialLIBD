@@ -135,8 +135,8 @@ add_qc_metrics <- function(spe, overwrite = FALSE) {
     )
 
     qcfilter <- data.frame(
-        low_lib_size = scater::isOutlier(qc_df$log2sum, type = "lower", log = TRUE, batch = qc_df$sample_id),
-        low_n_features = scater::isOutlier(qc_df$log2detected, type = "lower", log = TRUE, batch = qc_df$sample_id),
+        low_lib_size = scater::isOutlier(qc_df$sum_umi, type = "lower", log = TRUE, batch = qc_df$sample_id),
+        low_n_features = scater::isOutlier(qc_df$sum_gene, type = "lower", log = TRUE, batch = qc_df$sample_id),
         high_subsets_Mito_percent = scater::isOutlier(qc_df$subsets_Mito_percent, type = "higher", batch = qc_df$sample_id)
     ) |>
         dplyr::mutate(discard = (low_lib_size | low_n_features) | high_subsets_Mito_percent)
