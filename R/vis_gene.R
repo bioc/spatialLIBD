@@ -36,6 +36,11 @@
 #' the proportion of continuous variables with positive values for each spot is
 #' computed. For more details, check the multi gene vignette at
 #' <https://research.libd.org/spatialLIBD/articles/multi_gene_plots.html>.
+#' @param cap_percentile A `numeric(1)` in (0, 1] determining the maximum
+#' percentile (as a proportion) at which to cap expression. For example, a value
+#' of 0.95 sets the top 5% of expression values to the 95th percentile value.
+#' This can help make the color scale more dynamic in the presence of high
+#' outliers. Defaults to `1`, which effectively performs no capping.
 #'
 #' @return A [ggplot2][ggplot2::ggplot] object.
 #' @export
@@ -128,12 +133,13 @@
 #'     )
 #'
 #'     ## Plot all white matter markers at once using the Z-score combination
-#'     ## method
+#'     ## method. Flatten this quantity at the top 5% of values for plotting
 #'     p6 <- vis_gene(
 #'         spe = spe,
 #'         sampleid = "151507",
 #'         geneid = white_matter_genes,
-#'         multi_gene_method = "z_score"
+#'         multi_gene_method = "z_score",
+#'         cap_percentile = 0.95
 #'     )
 #'     print(p6)
 #'
@@ -174,6 +180,7 @@ vis_gene <-
         na_color = "#CCCCCC40",
         multi_gene_method = c("z_score", "pca", "sparsity"),
         is_stitched = FALSE,
+        cap_percentile = 1,
         ...) {
         multi_gene_method <- rlang::arg_match(multi_gene_method)
         #   Verify existence and legitimacy of 'sampleid'
@@ -200,6 +207,11 @@ vis_gene <-
                 "Abnormal spatial coordinates: should have 'pxl_row_in_fullres' and 'pxl_col_in_fullres' columns.",
                 call. = FALSE
             )
+        }
+
+        #   Validate 'cap_percentile'
+        if (cap_percentile <= 0 || cap_percentile > 1) {
+            stop("'cap_percentile' must be in (0, 1]", call. = FALSE)
         }
 
         spe_sub <- spe[, spe$sample_id == sampleid]
@@ -283,6 +295,16 @@ vis_gene <-
                 legend_title <- paste("PC1\n min > ", minCount)
             }
         }
+
+        #   Cap the expression values at the given percentile, if applicable
+        if (cap_percentile < 1) {
+            sorted_count = sort(d$COUNT)
+            cap = sorted_count[
+                as.integer(round(length(sorted_count) * cap_percentile))
+            ]
+            d$COUNT[d$COUNT > cap] = cap
+        }
+
         d$COUNT[d$COUNT <= minCount] <- NA
 
         p <- vis_gene_p(
