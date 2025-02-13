@@ -54,6 +54,7 @@ vis_grid_gene <-
         auto_crop = TRUE,
         na_color = "#CCCCCC40",
         is_stitched = FALSE,
+        cap_percentile = 1,
         ...) {
         stopifnot(all(sample_order %in% unique(spe$sample_id)))
 
@@ -73,6 +74,7 @@ vis_grid_gene <-
                 auto_crop = auto_crop,
                 na_color = na_color,
                 is_stitched = is_stitched,
+                cap_percentile = cap_percentile,
                 ...
             )
         })

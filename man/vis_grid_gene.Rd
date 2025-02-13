@@ -24,6 +24,7 @@ vis_grid_gene(
   auto_crop = TRUE,
   na_color = "#CCCCCC40",
   is_stitched = FALSE,
+  cap_percentile = 1,
   ...
 )
 }
@@ -100,6 +101,12 @@ with \code{visiumStitched::build_spe()}.
 \url{http://research.libd.org/visiumStitched/reference/build_spe.html}; in
 particular, expects a logical colData column \code{exclude_overlapping}
 specifying which spots to exclude from the plot. Sets \code{auto_crop = FALSE}.}
+
+\item{cap_percentile}{A \code{numeric(1)} in (0, 1] determining the maximum
+percentile (as a proportion) at which to cap expression. For example, a value
+of 0.95 sets the top 5\% of expression values to the 95th percentile value.
+This can help make the color scale more dynamic in the presence of high
+outliers. Defaults to \code{1}, which effectively performs no capping.}
 
 \item{...}{Passed to \link[base:paste]{paste0()} for making the title of the
 plot following the \code{sampleid}.}
