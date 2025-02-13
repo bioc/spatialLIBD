@@ -239,7 +239,8 @@ app_server <- function(input, output, session) {
                     alpha = input$alphalevel,
                     point_size = input$pointsize,
                     auto_crop = input$auto_crop,
-                    is_stitched = is_stitched
+                    is_stitched = is_stitched,
+                    cap_percentile = input$cap_percentile
                 )
                 if (!input$side_by_side_gene) {
                     p_result <- p
@@ -288,7 +289,8 @@ app_server <- function(input, output, session) {
                         point_size = isolate(input$pointsize),
                         sample_order = isolate(input$gene_grid_samples),
                         auto_crop = isolate(input$auto_crop),
-                        is_stitched = is_stitched
+                        is_stitched = is_stitched,
+                        cap_percentile = isolate(input$cap_percentile)
                     )
             },
             warning = function(w) {

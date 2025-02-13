@@ -147,6 +147,18 @@ app_ui <- function() {
                             "You can manually enter any number then press enter in your keyboard. This is useful for extreme values."
                         ),
                         hr(),
+                        numericInput(
+                            inputId = "cap_percentile",
+                            label = "Maximum count percentile",
+                            value = 1,
+                            min = 0.05,
+                            max = 1,
+                            step = 0.05
+                        ),
+                        helpText(
+                            "When set below 1, counts above the given percentile (e.g. 0.95 for 95th) are capped, typically to control outliers"
+                        ),
+                        hr(),
                         selectInput(
                             inputId = "genecolor",
                             label = "Gene color scale",
