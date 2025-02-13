@@ -739,6 +739,16 @@ app_server <- function(input, output, session) {
                 plot_title <- paste(sampleid, "PC1 min >", minCount)
             }
         }
+
+        #   Cap the expression values at the given percentile, if applicable
+        if (input$cap_percentile < 1) {
+            sorted_count = sort(d$COUNT)
+            cap = sorted_count[
+                as.integer(round(length(sorted_count) * input$cap_percentile))
+            ]
+            d$COUNT[d$COUNT > cap] = cap
+        }
+
         d$COUNT[d$COUNT <= minCount] <- NA
 
         ## Add the reduced dims
@@ -1026,7 +1036,8 @@ app_server <- function(input, output, session) {
                 alpha = input$alphalevel,
                 point_size = input$pointsize,
                 auto_crop = input$auto_crop,
-                is_stitched = is_stitched
+                is_stitched = is_stitched,
+                cap_percentile = input$cap_percentile
             ) +
             geom_point(
                 shape = 21,
