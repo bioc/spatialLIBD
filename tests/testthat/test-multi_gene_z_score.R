@@ -40,5 +40,9 @@ test_that(
             multi_gene_z_score(cont_mat),
             "^After dropping features with no expression variation"
         )
+
+        #   Now actually verify the Z-score-based calculation is correct
+        cont_mat = matrix(c(1, 2, 3, -3, 0, 3, 7.5, 9, 10.5), nrow = 3)
+        expect_equal(multi_gene_z_score(cont_mat), c(-1, 0, 1))
     }
 )
