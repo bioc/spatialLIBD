@@ -1,3 +1,18 @@
+# spatialLIBD 1.19.8
+
+NEW FEATURES
+
+* `vis_gene()` now has the `cap_percentile` argument as implemented by
+@Nick-Eagles. This allows you to cap the expression values at a certain
+percentiles, which can be useful to exclude super high outlier values which
+are common with Visium HD data. See
+<https://github.com/LieberInstitute/spatialLIBD/pull/97> for details.
+
+BUG FIXES
+
+* Fixed colors on `layer_stat_cor_plot()` thanks to @lahuuki. Details at
+<https://github.com/LieberInstitute/spatialLIBD/pull/94>.
+
 # spatialLIBD 1.19.7
 
 BUG FIXES
