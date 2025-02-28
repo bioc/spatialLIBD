@@ -140,7 +140,6 @@ app_ui <- function() {
                             label = "Minimum count value",
                             value = 0,
                             min = -1,
-                            max = max(assays(spe)[[length(assayNames(spe))]]),
                             step = 1
                         ),
                         helpText(
@@ -319,16 +318,14 @@ app_ui <- function() {
                                 numericInput(
                                     "grid_nrow",
                                     label = "N rows",
-                                    value = 1,
-                                    min = 1,
-                                    max = 3
+                                    value = round(length(unique(spe$sample_id)) / 3 + 0.5),
+                                    min = 1
                                 ),
                                 numericInput(
                                     "grid_ncol",
                                     label = "N columns",
                                     value = 3,
-                                    min = 1,
-                                    max = 4
+                                    min = 1
                                 ),
                                 actionButton("grid_update", label = "Update grid plot"),
                                 downloadButton("downloadPlotHistologyGrid", "Download PDF"),
@@ -421,16 +418,14 @@ app_ui <- function() {
                                 numericInput(
                                     "gene_grid_nrow",
                                     label = "N rows",
-                                    value = 1,
-                                    min = 1,
-                                    max = 3
+                                    value = round(length(unique(spe$sample_id)) / 3 + 0.5),
+                                    min = 1
                                 ),
                                 numericInput(
                                     "gene_grid_ncol",
                                     label = "N columns",
                                     value = 3,
-                                    min = 1,
-                                    max = 4
+                                    min = 1
                                 ),
                                 actionButton("gene_grid_update", label = "Update grid plot"),
                                 downloadButton("downloadPlotGeneGrid", "Download PDF"),

@@ -246,7 +246,7 @@ if (enough_ram(9e9)) {
 
 ## Example for an object with multiple capture areas stitched together with
 ## <http://research.libd.org/visiumStitched/>.
-spe_stitched <- fetch_data("Visium_LS_spe")
+spe_stitched <- fetch_data("visiumStitched_brain_spe")
 
 ## Inspect this object
 spe_stitched

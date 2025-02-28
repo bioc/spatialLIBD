@@ -8,7 +8,7 @@ layer_stat_cor_plot(
   cor_stats_layer,
   color_max = max(cor_stats_layer),
   color_min = min(cor_stats_layer),
-  color_scale = c("#762A83", "#F7F7F7", "#1B7837"),
+  color_scale = RColorBrewer::brewer.pal(7, "PRGn"),
   query_colors = NULL,
   reference_colors = NULL,
   annotation = NULL,
@@ -24,9 +24,10 @@ the color scale (should be between 0 and 1).}
 \item{color_min}{A \code{numeric(1)} specifying the lowest correlation value for
 the color scale (should be between 0 and -1).}
 
-\item{color_scale}{A \code{character(3)} vector specifying the color scale for the
-fill of the heatmap. The first value is used for \code{color_min}, the second one
-for zero, and the third for \code{color_max}.}
+\item{color_scale}{A \code{character} vector with three or more values specifying
+the color scale for the fill of the heatmap. The first value is used for
+\code{color_min}, the middle for zero, and the last for \code{color_max}. If an even
+number of colors are supplied, the last color is dropped to center zero.}
 
 \item{query_colors}{named \code{character} vector of colors, Adds colors to query
 row annotations.}
@@ -83,7 +84,7 @@ cor_stats_layer <- layer_stat_cor(
 ## Default plot with no annotations and defaults for ComplexHeatmap()
 layer_stat_cor_plot(cor_stats_layer)
 
-## add colors
+## add Annotation colors
 ## add libd_layer_colors to reference Human Pilot layers
 layer_stat_cor_plot(cor_stats_layer, reference_colors = libd_layer_colors)
 
@@ -107,9 +108,14 @@ annotation_df <- annotate_registered_clusters(
 )
 layer_stat_cor_plot(cor_stats_layer, annotation = annotation_df)
 
+## change fill color scale
+layer_stat_cor_plot(cor_stats_layer, 
+                    color_scale = RColorBrewer::brewer.pal(2, "PiYG"))
+
 ## All together
 layer_stat_cor_plot(
-    cor_stats_layer,
+    cor_stats_layer, 
+    color_scale = RColorBrewer::brewer.pal(5, "PiYG"),
     query_colors = cluster_colors,
     reference_colors = libd_layer_colors,
     annotation = annotation_df,
