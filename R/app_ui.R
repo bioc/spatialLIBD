@@ -140,7 +140,6 @@ app_ui <- function() {
                             label = "Minimum count value",
                             value = 0,
                             min = -1,
-                            max = max(assays(spe)[[length(assayNames(spe))]]),
                             step = 1
                         ),
                         helpText(
