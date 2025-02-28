@@ -21,6 +21,7 @@ vis_gene(
   na_color = "#CCCCCC40",
   multi_gene_method = c("z_score", "pca", "sparsity"),
   is_stitched = FALSE,
+  cap_percentile = 1,
   ...
 )
 }
@@ -99,6 +100,12 @@ with \code{visiumStitched::build_spe()}.
 \url{http://research.libd.org/visiumStitched/reference/build_spe.html}; in
 particular, expects a logical colData column \code{exclude_overlapping}
 specifying which spots to exclude from the plot. Sets \code{auto_crop = FALSE}.}
+
+\item{cap_percentile}{A \code{numeric(1)} in (0, 1] determining the maximum
+percentile (as a proportion) at which to cap expression. For example, a value
+of 0.95 sets the top 5\% of expression values to the 95th percentile value.
+This can help make the color scale more dynamic in the presence of high
+outliers. Defaults to \code{1}, which effectively performs no capping.}
 
 \item{...}{Passed to \link[base:paste]{paste0()} for making the title of the
 plot following the \code{sampleid}.}
@@ -198,12 +205,13 @@ if (enough_ram()) {
     )
 
     ## Plot all white matter markers at once using the Z-score combination
-    ## method
+    ## method. Flatten this quantity at the top 5\% of values for plotting
     p6 <- vis_gene(
         spe = spe,
         sampleid = "151507",
         geneid = white_matter_genes,
-        multi_gene_method = "z_score"
+        multi_gene_method = "z_score",
+        cap_percentile = 0.95
     )
     print(p6)
 
