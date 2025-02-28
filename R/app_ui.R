@@ -318,7 +318,7 @@ app_ui <- function() {
                                 numericInput(
                                     "grid_nrow",
                                     label = "N rows",
-                                    value = round(length(unique(spe$sample_id)) / 3 + 0.5),
+                                    value = round(length(unique(spe$sample_id)) / (3 * 4) + 0.5),
                                     min = 1
                                 ),
                                 numericInput(
@@ -418,7 +418,7 @@ app_ui <- function() {
                                 numericInput(
                                     "gene_grid_nrow",
                                     label = "N rows",
-                                    value = round(length(unique(spe$sample_id)) / 3 + 0.5),
+                                    value = round(length(unique(spe$sample_id)) / (3 * 4) + 0.5),
                                     min = 1
                                 ),
                                 numericInput(
