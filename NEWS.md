@@ -1,3 +1,18 @@
+# spatialLIBD 1.19.7
+
+BUG FIXES
+
+* Removed code that made the app very slow to load using `HDF5Array` objects.
+See
+<https://github.com/LieberInstitute/spatialLIBD/commit/b80d92c3271a6ad92859f79a3bc343f77bad9bf2>
+for details.
+* Fixed a bug on the Z-score calculation in `multi_gene_z_score()`. See
+<https://github.com/LieberInstitute/spatialLIBD/commit/2d17ea2c3d1b73b38fbd50503765052c8487b9b1>
+for details. Implemented by @Nick-Eagles.
+* Fix a bug in the documentation of `run_app()` for the example stitched data.
+* No longer point to Twitter, instead point to Bluesky. This is for the package
+main README file as well as the default app documentation files.
+
 # spatialLIBD 1.19.5
 
 BUG FIXES

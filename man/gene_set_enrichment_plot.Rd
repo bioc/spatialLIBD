@@ -44,13 +44,16 @@ from \code{enrichment} as an \code{anno_barplot} at the top of the heatmap.}
 \item{gene_list_length}{Optional named \code{numeric} vector indicating the length
 of the \code{gene_list} used to calculate \code{enrichment}, if included and
 \code{plot_setSize_bar = TRUE} then the top \code{anno_barplot} will show the \code{SetSize}
-and the difference from the length of the input gene_list.
-#' @param model_sig_length Optional named \code{numeric} vector indicating the
+and the difference from the length of the input gene_list.}
+
+\item{model_sig_length}{Optional named \code{numeric} vector indicating the
 number of significant genes in \code{modeling_results} used to calculate
-\code{enrichment}. If included \code{anno_barplot} will be added to rows.
-#' @param model_colors named \code{character} vector of colors. It adds colors to
-row annotations.
-#' @param ... Additional parameters passed to
+\code{enrichment}. If included \code{anno_barplot} will be added to rows.}
+
+\item{model_colors}{named \code{character} vector of colors. It adds colors to
+row annotations.}
+
+\item{...}{Additional parameters passed to
 \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}.}
 }
 \value{

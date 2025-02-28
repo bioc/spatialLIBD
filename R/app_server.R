@@ -146,18 +146,6 @@ app_server <- function(input, output, session) {
         }
     })
 
-    # Set the max based on the assay
-    observeEvent(input$assayname, {
-        updateNumericInput(
-            session,
-            inputId = "minCount",
-            value = 0,
-            min = -1,
-            max = max(assays(spe)[[input$assayname]]),
-            step = 1
-        )
-    })
-
     ## Static plotting functions
     static_histology <- reactive({
         if (input$cluster == "ManualAnnotation") {

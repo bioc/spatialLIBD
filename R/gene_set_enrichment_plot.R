@@ -26,13 +26,13 @@
 #' @param gene_list_length Optional named `numeric` vector indicating the length
 #' of the `gene_list` used to calculate `enrichment`, if included and
 #' `plot_setSize_bar = TRUE` then the top `anno_barplot` will show the `SetSize`
-#'  and the difference from the length of the input gene_list.
-#' #' @param model_sig_length Optional named `numeric` vector indicating the
+#' and the difference from the length of the input gene_list.
+#' @param model_sig_length Optional named `numeric` vector indicating the
 #' number of significant genes in `modeling_results` used to calculate
 #' `enrichment`. If included `anno_barplot` will be added to rows.
-#' #' @param model_colors named `character` vector of colors. It adds colors to
+#' @param model_colors named `character` vector of colors. It adds colors to
 #' row annotations.
-#' #' @param ... Additional parameters passed to
+#' @param ... Additional parameters passed to
 #' [ComplexHeatmap::Heatmap()][ComplexHeatmap::Heatmap()].
 #'
 #' @return A ([Heatmap-class][ComplexHeatmap::Heatmap-class]) visualizing the
@@ -148,18 +148,17 @@
 #' )
 #'
 gene_set_enrichment_plot <-
-    function(
-        enrichment,
-        xlabs = unique(enrichment$ID),
-        PThresh = 12,
-        ORcut = 3,
-        enrichOnly = FALSE,
-        mypal = c("white", RColorBrewer::brewer.pal(9, "YlOrRd")),
-        plot_SetSize_bar = FALSE,
-        gene_list_length = NULL,
-        model_sig_length = NULL,
-        model_colors = NULL,
-        ...) {
+    function(enrichment,
+    xlabs = unique(enrichment$ID),
+    PThresh = 12,
+    ORcut = 3,
+    enrichOnly = FALSE,
+    mypal = c("white", RColorBrewer::brewer.pal(9, "YlOrRd")),
+    plot_SetSize_bar = FALSE,
+    gene_list_length = NULL,
+    model_sig_length = NULL,
+    model_colors = NULL,
+    ...) {
         ## Re-order and shorten names if they match our data
         if (all(unique(enrichment$test) %in% c("WM", paste0("Layer", seq_len(6))))) {
             enrichment$test <-

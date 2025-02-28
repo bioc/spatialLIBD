@@ -61,14 +61,10 @@ application. Please check the
 pre-print](https://www.biorxiv.org/content/10.1101/2020.02.28.969931v1)
 for more details about this project.
 
-If you tweet about this website, the data or the R package please use
-the <code>\#spatialLIBD</code> hashtag. You can find previous tweets
-that way as shown
-<a href="https://twitter.com/search?q=%23spatialLIBD&src=typed_query">here</a>.
+If you write about this website, the data or the R package please use
+the <code>\#spatialLIBD</code> hashtag. See previous tagged Bluesky posts 
+<a href="https://bsky.app/search?q=%23spatialLIBD">here</a>.
 Thank you!
-<a href="https://twitter.com/intent/tweet?button_hashtag=spatialLIBD&ref_src=twsrc%5Etfw" class="twitter-hashtag-button" data-show-count="false">Tweet
-\#spatialLIBD</a>
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 ## Study design
 
