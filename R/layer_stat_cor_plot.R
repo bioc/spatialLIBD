@@ -98,15 +98,14 @@
 #'     cluster_columns = FALSE
 #' )
 #'
-layer_stat_cor_plot <- function(
-        cor_stats_layer,
-        color_max = max(cor_stats_layer),
-        color_min = min(cor_stats_layer),
-        color_scale = c("#762A83", "#F7F7F7", "#1B7837"),
-        query_colors = NULL,
-        reference_colors = NULL,
-        annotation = NULL,
-        ...) {
+layer_stat_cor_plot <- function(cor_stats_layer,
+    color_max = max(cor_stats_layer),
+    color_min = min(cor_stats_layer),
+    color_scale = c("#762A83", "#F7F7F7", "#1B7837"),
+    query_colors = NULL,
+    reference_colors = NULL,
+    annotation = NULL,
+    ...) {
     ## define color pallet
     stopifnot(color_min < color_max)
     stopifnot(color_min < 0)

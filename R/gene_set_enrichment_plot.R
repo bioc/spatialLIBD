@@ -148,18 +148,17 @@
 #' )
 #'
 gene_set_enrichment_plot <-
-    function(
-        enrichment,
-        xlabs = unique(enrichment$ID),
-        PThresh = 12,
-        ORcut = 3,
-        enrichOnly = FALSE,
-        mypal = c("white", RColorBrewer::brewer.pal(9, "YlOrRd")),
-        plot_SetSize_bar = FALSE,
-        gene_list_length = NULL,
-        model_sig_length = NULL,
-        model_colors = NULL,
-        ...) {
+    function(enrichment,
+    xlabs = unique(enrichment$ID),
+    PThresh = 12,
+    ORcut = 3,
+    enrichOnly = FALSE,
+    mypal = c("white", RColorBrewer::brewer.pal(9, "YlOrRd")),
+    plot_SetSize_bar = FALSE,
+    gene_list_length = NULL,
+    model_sig_length = NULL,
+    model_colors = NULL,
+    ...) {
         ## Re-order and shorten names if they match our data
         if (all(unique(enrichment$test) %in% c("WM", paste0("Layer", seq_len(6))))) {
             enrichment$test <-
