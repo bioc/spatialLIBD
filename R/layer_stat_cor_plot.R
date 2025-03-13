@@ -199,6 +199,15 @@ layer_stat_cor_plot <- function(
 }
 
 create_annotation_matrix <- function(annotation_df, cor_stats_layer) {
+  
+    if(!setequal(rownames(cor_stats_layer), annotation_df$cluster)){
+      stop(
+        "Query cluster names do not match between rownames(cor_stats_layer) and annotation$cluster.\n
+        Be sure the annotation data matches.",
+        call. = FALSE
+      )
+    }
+      
     anno_list <- lapply(
         rownames(cor_stats_layer),
         function(cluster) {
@@ -207,7 +216,9 @@ create_annotation_matrix <- function(annotation_df, cor_stats_layer) {
             sym <- ifelse(confidence == "good", "X", "*")
             # match annotations
             anno <- annotation_df[match(cluster, annotation_df$cluster), "layer_label"]
-            return(ifelse(unlist(lapply(colnames(cor_stats_layer), grepl, anno)), sym, ""))
+            anno_lgl_row <- unlist(lapply(colnames(cor_stats_layer), "%in%", unlist(strsplit(anno, split = "/"))))
+            
+            return(ifelse(anno_lgl_row, sym, ""))
         }
     )
 
