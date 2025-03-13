@@ -58,6 +58,13 @@ annotate_registered_clusters <-
                 annotate_registered_cluster,
                 cutoff_merge_ratio = cutoff_merge_ratio
             )
+        
+        if(any(grepl("/", colnames(cor_stats_layer)))) {
+          stop(
+            "Cannot use refrence lables containing '/' - check colnames(cor_stats_layer)",
+            call. = FALSE
+          )
+        }
 
         confidence <- apply(cor_stats_layer, 1, max) > confidence_threshold
 
