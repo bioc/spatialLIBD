@@ -41,6 +41,15 @@ annotation_df_numeric <- annotate_registered_clusters(
 layer_stat_cor_plot(cor_stats_numeric, annotation = annotation_df_numeric)
 
 
-test_that("multiplication works", {
-  expect_equal(2 * 2, 4)
+test_that("annotation checks work",{
+  annotation_df$cluster <- gsub("Sp09", "",annotation_df$cluster)
+  expect_error(create_annotation_matrix(annotation_df, cor_stats_layer))
+})
+
+test_that("annotation matrix works w/ short cluster names", {
+  anno_matrix <- create_annotation_matrix(annotation_df, cor_stats_layer)
+  anno_matrix_numeric <- create_annotation_matrix(annotation_df_numeric, cor_stats_numeric)
+  colnames(anno_matrix_numeric) <- colnames(anno_matrix)
+  
+  expect_equal(anno_matrix, anno_matrix_numeric)
 })
