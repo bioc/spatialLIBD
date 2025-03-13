@@ -1,4 +1,3 @@
-
 ## Obtain the necessary data
 ## reference human pilot modeling results
 if (!exists("modeling_results")) {
@@ -34,23 +33,22 @@ cor_stats_numeric <- cor_stats_layer
 colnames(cor_stats_numeric) <- c(13, 6:1)
 
 annotation_df_numeric <- annotate_registered_clusters(
-  cor_stats_numeric,
-  confidence_threshold = .55
+    cor_stats_numeric,
+    confidence_threshold = .55
 )
 
 # layer_stat_cor_plot(cor_stats_numeric, annotation = annotation_df_numeric)
 
 
-test_that("annotation checks work",{
-  annotation_df$cluster <- gsub("Sp09", "",annotation_df$cluster)
-  expect_error(create_annotation_matrix(annotation_df, cor_stats_layer))
+test_that("annotation checks work", {
+    annotation_df$cluster <- gsub("Sp09", "", annotation_df$cluster)
+    expect_error(create_annotation_matrix(annotation_df, cor_stats_layer))
 })
 
 test_that("annotation matrix works w/ short cluster names", {
-  anno_matrix <- create_annotation_matrix(annotation_df, cor_stats_layer)
-  anno_matrix_numeric <- create_annotation_matrix(annotation_df_numeric, cor_stats_numeric)
-  colnames(anno_matrix_numeric) <- colnames(anno_matrix)
-  
-  expect_equal(anno_matrix, anno_matrix_numeric)
-})
+    anno_matrix <- create_annotation_matrix(annotation_df, cor_stats_layer)
+    anno_matrix_numeric <- create_annotation_matrix(annotation_df_numeric, cor_stats_numeric)
+    colnames(anno_matrix_numeric) <- colnames(anno_matrix)
 
+    expect_equal(anno_matrix, anno_matrix_numeric)
+})

@@ -164,24 +164,23 @@
 #'     print(p8)
 #' }
 vis_gene <-
-    function(
-        spe,
-        sampleid = unique(spe$sample_id)[1],
-        geneid = rowData(spe)$gene_search[1],
-        spatial = TRUE,
-        assayname = "logcounts",
-        minCount = 0,
-        viridis = TRUE,
-        image_id = "lowres",
-        alpha = NA,
-        cont_colors = if (viridis) viridisLite::viridis(21) else c("aquamarine4", "springgreen", "goldenrod", "red"),
-        point_size = 2,
-        auto_crop = TRUE,
-        na_color = "#CCCCCC40",
-        multi_gene_method = c("z_score", "pca", "sparsity"),
-        is_stitched = FALSE,
-        cap_percentile = 1,
-        ...) {
+    function(spe,
+    sampleid = unique(spe$sample_id)[1],
+    geneid = rowData(spe)$gene_search[1],
+    spatial = TRUE,
+    assayname = "logcounts",
+    minCount = 0,
+    viridis = TRUE,
+    image_id = "lowres",
+    alpha = NA,
+    cont_colors = if (viridis) viridisLite::viridis(21) else c("aquamarine4", "springgreen", "goldenrod", "red"),
+    point_size = 2,
+    auto_crop = TRUE,
+    na_color = "#CCCCCC40",
+    multi_gene_method = c("z_score", "pca", "sparsity"),
+    is_stitched = FALSE,
+    cap_percentile = 1,
+    ...) {
         multi_gene_method <- rlang::arg_match(multi_gene_method)
         #   Verify existence and legitimacy of 'sampleid'
         if (
@@ -298,11 +297,11 @@ vis_gene <-
 
         #   Cap the expression values at the given percentile, if applicable
         if (cap_percentile < 1) {
-            sorted_count = sort(d$COUNT)
-            cap = sorted_count[
+            sorted_count <- sort(d$COUNT)
+            cap <- sorted_count[
                 as.integer(round(length(sorted_count) * cap_percentile))
             ]
-            d$COUNT[d$COUNT > cap] = cap
+            d$COUNT[d$COUNT > cap] <- cap
         }
 
         d$COUNT[d$COUNT <= minCount] <- NA

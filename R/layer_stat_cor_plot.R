@@ -91,7 +91,8 @@
 #'
 #' ## change fill color scale
 #' layer_stat_cor_plot(cor_stats_layer,
-#'                     color_scale = RColorBrewer::brewer.pal(2, "PiYG"))
+#'     color_scale = RColorBrewer::brewer.pal(2, "PiYG")
+#' )
 #'
 #' ## All together
 #' layer_stat_cor_plot(
@@ -104,15 +105,14 @@
 #'     cluster_columns = FALSE
 #' )
 #'
-layer_stat_cor_plot <- function(
-        cor_stats_layer,
-        color_max = max(cor_stats_layer),
-        color_min = min(cor_stats_layer),
-        color_scale = RColorBrewer::brewer.pal(7, "PRGn"),
-        query_colors = NULL,
-        reference_colors = NULL,
-        annotation = NULL,
-        ...) {
+layer_stat_cor_plot <- function(cor_stats_layer,
+    color_max = max(cor_stats_layer),
+    color_min = min(cor_stats_layer),
+    color_scale = RColorBrewer::brewer.pal(7, "PRGn"),
+    query_colors = NULL,
+    reference_colors = NULL,
+    annotation = NULL,
+    ...) {
     ## define color pallet
     stopifnot(color_min < color_max)
     stopifnot(color_min < 0)
@@ -120,20 +120,24 @@ layer_stat_cor_plot <- function(
 
     # create a sequence from color_min to color max centered around 0
     n.col <- length(color_scale)
-    zero_center_seq <- unique(c(seq(color_min, 0, length.out = ceiling(n.col/2)),
-                                seq(0, color_max, length.out = ceiling(n.col/2))))
+    zero_center_seq <- unique(c(
+        seq(color_min, 0, length.out = ceiling(n.col / 2)),
+        seq(0, color_max, length.out = ceiling(n.col / 2))
+    ))
 
-    if(!length(color_scale) == length(zero_center_seq)){
-      warning(sprintf("Using %d/%d colors to center zero, dropping %s",
-                      length(zero_center_seq),
-                      n.col,
-                      color_scale[n.col]), call. = FALSE)
-      color_scale <- color_scale[seq(length(zero_center_seq))]
+    if (!length(color_scale) == length(zero_center_seq)) {
+        warning(sprintf(
+            "Using %d/%d colors to center zero, dropping %s",
+            length(zero_center_seq),
+            n.col,
+            color_scale[n.col]
+        ), call. = FALSE)
+        color_scale <- color_scale[seq(length(zero_center_seq))]
     }
 
     my.col <- circlize::colorRamp2(
-      breaks = zero_center_seq,
-      colors = color_scale
+        breaks = zero_center_seq,
+        colors = color_scale
     )
 
     # ## query annotations on row
@@ -199,15 +203,14 @@ layer_stat_cor_plot <- function(
 }
 
 create_annotation_matrix <- function(annotation_df, cor_stats_layer) {
-  
-    if(!setequal(rownames(cor_stats_layer), annotation_df$cluster)){
-      stop(
-        "Query cluster names do not match between rownames(cor_stats_layer) and annotation$cluster.\n
+    if (!setequal(rownames(cor_stats_layer), annotation_df$cluster)) {
+        stop(
+            "Query cluster names do not match between rownames(cor_stats_layer) and annotation$cluster.\n
         Be sure the annotation data matches.",
-        call. = FALSE
-      )
+            call. = FALSE
+        )
     }
-      
+
     anno_list <- lapply(
         rownames(cor_stats_layer),
         function(cluster) {
@@ -215,9 +218,9 @@ create_annotation_matrix <- function(annotation_df, cor_stats_layer) {
             confidence <- annotation_df[match(cluster, annotation_df$cluster), "layer_confidence"]
             sym <- ifelse(confidence == "good", "X", "*")
             # match annotations
-            anno <- gsub("\\*","",annotation_df[match(cluster, annotation_df$cluster), "layer_label"])
+            anno <- gsub("\\*", "", annotation_df[match(cluster, annotation_df$cluster), "layer_label"])
             anno_lgl_row <- unlist(lapply(colnames(cor_stats_layer), "%in%", unlist(strsplit(anno, split = "/"))))
-            
+
             return(ifelse(anno_lgl_row, sym, ""))
         }
     )

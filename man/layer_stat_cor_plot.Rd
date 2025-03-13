@@ -109,12 +109,13 @@ annotation_df <- annotate_registered_clusters(
 layer_stat_cor_plot(cor_stats_layer, annotation = annotation_df)
 
 ## change fill color scale
-layer_stat_cor_plot(cor_stats_layer, 
-                    color_scale = RColorBrewer::brewer.pal(2, "PiYG"))
+layer_stat_cor_plot(cor_stats_layer,
+    color_scale = RColorBrewer::brewer.pal(2, "PiYG")
+)
 
 ## All together
 layer_stat_cor_plot(
-    cor_stats_layer, 
+    cor_stats_layer,
     color_scale = RColorBrewer::brewer.pal(5, "PiYG"),
     query_colors = cluster_colors,
     reference_colors = libd_layer_colors,

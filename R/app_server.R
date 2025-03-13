@@ -730,11 +730,11 @@ app_server <- function(input, output, session) {
 
         #   Cap the expression values at the given percentile, if applicable
         if (input$cap_percentile < 1) {
-            sorted_count = sort(d$COUNT)
-            cap = sorted_count[
+            sorted_count <- sort(d$COUNT)
+            cap <- sorted_count[
                 as.integer(round(length(sorted_count) * input$cap_percentile))
             ]
-            d$COUNT[d$COUNT > cap] = cap
+            d$COUNT[d$COUNT > cap] <- cap
         }
 
         d$COUNT[d$COUNT <= minCount] <- NA
