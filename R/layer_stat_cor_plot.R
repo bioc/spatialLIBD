@@ -215,7 +215,7 @@ create_annotation_matrix <- function(annotation_df, cor_stats_layer) {
             confidence <- annotation_df[match(cluster, annotation_df$cluster), "layer_confidence"]
             sym <- ifelse(confidence == "good", "X", "*")
             # match annotations
-            anno <- annotation_df[match(cluster, annotation_df$cluster), "layer_label"]
+            anno <- gsub("\\*","",annotation_df[match(cluster, annotation_df$cluster), "layer_label"])
             anno_lgl_row <- unlist(lapply(colnames(cor_stats_layer), "%in%", unlist(strsplit(anno, split = "/"))))
             
             return(ifelse(anno_lgl_row, sym, ""))
