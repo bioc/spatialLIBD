@@ -1,3 +1,17 @@
+# spatialLIBD 1.19.9
+
+BUG FIXES
+
+* @lahuuki resolved the bug we discovered on a dataset being analyzed by
+@Nick-Eagles as we documented at
+<https://github.com/LieberInstitute/spatialLIBD/issues/98>. Basically, an
+internal function used by `layer_stat_cor_plot()` was having issues with cluster
+names that were just numbers such as "1", "2", ..., "13" where
+`annotate_registered_clusters()` could result in a "9/13" annotation but then
+that would match with "1", "3", "9", and "13" instead of just "9" and "13", thus
+introducing incorrect "X" annotations on `layer_stat_cor_plot()`. @lahuuki
+resolved this at <https://github.com/LieberInstitute/spatialLIBD/pull/99>.
+
 # spatialLIBD 1.19.8
 
 NEW FEATURES
