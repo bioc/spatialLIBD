@@ -18,7 +18,7 @@ cor_stats_layer <- layer_stat_cor(
 )
 
 ## Default plot with no annotations and defaults for ComplexHeatmap()
-layer_stat_cor_plot(cor_stats_layer)
+# default_plot <- layer_stat_cor_plot(cor_stats_layer)
 
 
 ## Add annotation
@@ -27,7 +27,7 @@ annotation_df <- annotate_registered_clusters(
     confidence_threshold = .55
 )
 
-layer_stat_cor_plot(cor_stats_layer, annotation = annotation_df)
+# anno_plot <- layer_stat_cor_plot(cor_stats_layer, annotation = annotation_df)
 
 ## test w/ numeric reference lables
 cor_stats_numeric <- cor_stats_layer
@@ -38,7 +38,7 @@ annotation_df_numeric <- annotate_registered_clusters(
   confidence_threshold = .55
 )
 
-layer_stat_cor_plot(cor_stats_numeric, annotation = annotation_df_numeric)
+# layer_stat_cor_plot(cor_stats_numeric, annotation = annotation_df_numeric)
 
 
 test_that("annotation checks work",{
@@ -53,3 +53,4 @@ test_that("annotation matrix works w/ short cluster names", {
   
   expect_equal(anno_matrix, anno_matrix_numeric)
 })
+
