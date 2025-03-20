@@ -1,3 +1,11 @@
+# spatialLIBD 1.19.11
+
+BUG FIXES
+
+* @Nick-Eagles fixed a bug for specifying colors in `vis_clus()` and related
+functions when `NA` values are present in the cluster variable. For more
+details check <https://github.com/LieberInstitute/spatialLIBD/pull/102>.
+
 # spatialLIBD 1.19.10
 
 NEW FEATURES
