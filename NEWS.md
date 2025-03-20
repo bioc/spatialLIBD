@@ -1,3 +1,11 @@
+# spatialLIBD 1.19.10
+
+NEW FEATURES
+
+* @lahuuki added the `gene_name` argument to `sig_genes_extract()` and
+`sig_genes_extract_all()` to make these functions more flexible.
+See <https://github.com/LieberInstitute/spatialLIBD/pull/101> for details.
+
 # spatialLIBD 1.19.9
 
 BUG FIXES
