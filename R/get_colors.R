@@ -40,11 +40,9 @@
 #'     prob = c(0.3, 0.15, 0.55)
 #' )
 #' log_var_sorted <- sort_clusters(log_var)
-#' ## A color does get assigned to 'NA', but will be overwritten by
-#' ## 'na_color' passed to `vis_clus_p()` and related functions.
 #' get_colors(colors = NULL, clusters = log_var_sorted)
 get_colors <- function(colors = NULL, clusters) {
-    n_clus <- length(unique(clusters))
+    n_clus <- length(unique(clusters[!is.na(clusters)]))
 
     if (is.null(colors) | n_clus > length(colors)) {
         ## Original ones
