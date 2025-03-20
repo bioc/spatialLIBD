@@ -9,7 +9,8 @@ sig_genes_extract(
   modeling_results = fetch_data(type = "modeling_results"),
   model_type = names(modeling_results)[1],
   reverse = FALSE,
-  sce_layer = fetch_data(type = "sce_layer")
+  sce_layer = fetch_data(type = "sce_layer"),
+  gene_name = "gene_name"
 )
 }
 \arguments{
@@ -41,6 +42,10 @@ into \code{layerB-layerA}.}
 \linkS4class{SingleCellExperiment}
 object with the spot-level Visium data compressed via pseudo-bulking to the
 layer-level (group-level) resolution. See \code{\link[=fetch_data]{fetch_data()}} for more details.}
+
+\item{gene_name}{A \code{character(1)} specifying the \code{rowData(sce_layer)}
+column with the gene names that match the rownames of modeling_results.
+Defaults to "gene_name".}
 }
 \value{
 A \code{data.frame()} with the top \code{n} significant genes
