@@ -44,8 +44,8 @@ object with the spot-level Visium data compressed via pseudo-bulking to the
 layer-level (group-level) resolution. See \code{\link[=fetch_data]{fetch_data()}} for more details.}
 
 \item{gene_name}{A \code{character(1)} specifying the \code{rowData(sce_layer)}
-column with the gene names that match the rownames of modeling_results.
-Defaults to "gene_name".}
+column with the gene names that match the \code{rownames(modeling_results)}.
+Defaults to \code{"gene_name"}.}
 }
 \value{
 A \code{data.frame()} with the top \code{n} significant genes

@@ -31,9 +31,9 @@
 #' object with the spot-level Visium data compressed via pseudo-bulking to the
 #' layer-level (group-level) resolution. See [fetch_data()] for more details.
 #' @param gene_name A `character(1)` specifying the `rowData(sce_layer)`
-#' column with the gene names that match the rownames of modeling_results.
-#' Defaults to "gene_name".
-#' 
+#' column with the gene names that match the `rownames(modeling_results)`.
+#' Defaults to `"gene_name"`.
+#'
 #' @return A `data.frame()` with the top `n` significant genes
 #' (as ordered by their statistics in decreasing order) in long format. The
 #' specific columns are described further in the vignette.
