@@ -30,7 +30,10 @@
 #' \linkS4class{SingleCellExperiment}
 #' object with the spot-level Visium data compressed via pseudo-bulking to the
 #' layer-level (group-level) resolution. See [fetch_data()] for more details.
-#'
+#' @param gene_name A `character(1)` specifying the `rowData(sce_layer)`
+#' column with the gene names that match the rownames of modeling_results.
+#' Defaults to "gene_name".
+#' 
 #' @return A `data.frame()` with the top `n` significant genes
 #' (as ordered by their statistics in decreasing order) in long format. The
 #' specific columns are described further in the vignette.
@@ -65,7 +68,13 @@ sig_genes_extract <- function(
         modeling_results = fetch_data(type = "modeling_results"),
         model_type = names(modeling_results)[1],
         reverse = FALSE,
-        sce_layer = fetch_data(type = "sce_layer")) {
+        sce_layer = fetch_data(type = "sce_layer"),
+        gene_name = "gene_name") {
+  
+    ## check variables are present
+    stopifnot(model_type %in% names(modeling_results))
+    stopifnot(gene_name %in% colnames(rowData(sce_layer)))
+    
     model_results <- modeling_results[[model_type]]
 
     tstats <-
@@ -86,7 +95,7 @@ sig_genes_extract <- function(
     logFC <- model_results[, grep("logFC_", colnames(model_results)), drop = FALSE]
 
     sig_genes <- apply(tstats, 2, function(x) {
-        rowData(sce_layer)$gene_name[order(x, decreasing = TRUE)[seq_len(n)]]
+      rowData(sce_layer)[[gene_name]][order(x, decreasing = TRUE)[seq_len(n)]]
     })
 
     sig_i <- apply(tstats, 2, function(x) {
