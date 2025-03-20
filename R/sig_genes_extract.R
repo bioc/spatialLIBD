@@ -64,66 +64,94 @@
 #'     n = nrow(sce_layer)
 #' )
 sig_genes_extract <- function(
-        n = 10,
-        modeling_results = fetch_data(type = "modeling_results"),
-        model_type = names(modeling_results)[1],
-        reverse = FALSE,
-        sce_layer = fetch_data(type = "sce_layer"),
-        gene_name = "gene_name") {
-  
+    n = 10,
+    modeling_results = fetch_data(type = "modeling_results"),
+    model_type = names(modeling_results)[1],
+    reverse = FALSE,
+    sce_layer = fetch_data(type = "sce_layer"),
+    gene_name = "gene_name"
+) {
     ## check variables are present
     stopifnot(model_type %in% names(modeling_results))
     stopifnot(gene_name %in% colnames(rowData(sce_layer)))
-    
+
     model_results <- modeling_results[[model_type]]
 
     tstats <-
-        model_results[, grep("[f|t]_stat_", colnames(model_results)), drop = FALSE]
+        model_results[,
+            grep("[f|t]_stat_", colnames(model_results)),
+            drop = FALSE
+        ]
     colnames(tstats) <- gsub("[f|t]_stat_", "", colnames(tstats))
 
     if (reverse) {
         tstats <- tstats * -1
         colnames(tstats) <-
-            vapply(strsplit(colnames(tstats), "-"), function(x) {
-                paste(rev(x), collapse = "-")
-            }, character(1))
+            vapply(
+                strsplit(colnames(tstats), "-"),
+                function(x) {
+                    paste(rev(x), collapse = "-")
+                },
+                character(1)
+            )
     }
 
     pvals <-
         model_results[, grep("p_value_", colnames(model_results)), drop = FALSE]
     fdrs <- model_results[, grep("fdr_", colnames(model_results)), drop = FALSE]
-    logFC <- model_results[, grep("logFC_", colnames(model_results)), drop = FALSE]
+    logFC <- model_results[,
+        grep("logFC_", colnames(model_results)),
+        drop = FALSE
+    ]
 
     sig_genes <- apply(tstats, 2, function(x) {
-      rowData(sce_layer)[[gene_name]][order(x, decreasing = TRUE)[seq_len(n)]]
+        rowData(sce_layer)[[gene_name]][order(x, decreasing = TRUE)[seq_len(n)]]
     })
 
     sig_i <- apply(tstats, 2, function(x) {
         order(x, decreasing = TRUE)[seq_len(n)]
     })
     sig_genes_tstats <-
-        vapply(seq_len(ncol(sig_i)), function(i) {
-            tstats[sig_i[, i], i]
-        }, numeric(n))
+        vapply(
+            seq_len(ncol(sig_i)),
+            function(i) {
+                tstats[sig_i[, i], i]
+            },
+            numeric(n)
+        )
     if (ncol(logFC) > 0) {
         sig_genes_logFC <-
-            vapply(seq_len(ncol(sig_i)), function(i) {
-                logFC[sig_i[, i], i]
-            }, numeric(n))
+            vapply(
+                seq_len(ncol(sig_i)),
+                function(i) {
+                    logFC[sig_i[, i], i]
+                },
+                numeric(n)
+            )
         dimnames(sig_genes_logFC) <- dimnames(sig_genes)
     } else {
         sig_genes_logFC <- NULL
     }
 
     sig_genes_pvals <-
-        vapply(seq_len(ncol(sig_i)), function(i) {
-            pvals[sig_i[, i], i]
-        }, numeric(n))
+        vapply(
+            seq_len(ncol(sig_i)),
+            function(i) {
+                pvals[sig_i[, i], i]
+            },
+            numeric(n)
+        )
     sig_genes_fdr <-
-        vapply(seq_len(ncol(sig_i)), function(i) {
-            fdrs[sig_i[, i], i]
-        }, numeric(n))
-    dimnames(sig_genes_fdr) <- dimnames(sig_genes_tstats) <- dimnames(sig_genes_pvals) <- dimnames(sig_genes)
+        vapply(
+            seq_len(ncol(sig_i)),
+            function(i) {
+                fdrs[sig_i[, i], i]
+            },
+            numeric(n)
+        )
+    dimnames(sig_genes_fdr) <- dimnames(sig_genes_tstats) <- dimnames(
+        sig_genes_pvals
+    ) <- dimnames(sig_genes)
 
     ## Combine into a long format table
     sig_genes_tab <- data.frame(
